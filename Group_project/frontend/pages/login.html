@@ -8,68 +8,418 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/responsive.css">
+    <style>
+        /* Additional styling that won't interfere with existing classes */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Enhance navbar without removing classes */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1) !important;
+            padding: 1rem 5% !important;
+        }
+
+        .nav-container {
+            max-width: 1400px !important;
+            margin: 0 auto !important;
+            width: 100% !important;
+        }
+
+        .logo {
+            font-size: 1.8rem !important;
+            color: #2ecc71 !important;
+        }
+
+        .nav-menu li a {
+            font-weight: 500 !important;
+            transition: 0.3s !important;
+        }
+
+        .nav-menu li a:hover {
+            color: #2ecc71 !important;
+        }
+
+        /* Enhanced auth container */
+        .auth-container {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            min-height: calc(100vh - 80px) !important;
+            padding: 2rem !important;
+        }
+
+        /* Enhanced auth card */
+        .auth-card {
+            background: white !important;
+            padding: 3rem !important;
+            border-radius: 30px !important;
+            width: 100% !important;
+            max-width: 460px !important;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15) !important;
+            border: none !important;
+        }
+
+        /* New elements that don't conflict */
+        .auth-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            color: #2ecc71;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .auth-title {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .auth-subtitle-new {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .input-wrapper-new {
+            position: relative;
+        }
+
+        .input-icon-new {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bdc3c7;
+            font-size: 1rem;
+            z-index: 1;
+        }
+
+        .input-field-new {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            border: 2px solid #edf2f7;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            background: #fafbfc;
+            box-sizing: border-box;
+        }
+
+        .input-field-new:focus {
+            border-color: #2ecc71;
+            background: white;
+        }
+
+        .input-field-new:focus + .input-icon-new {
+            color: #2ecc71;
+        }
+
+        .label-row-new {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .forgot-link-new {
+            font-size: 0.75rem;
+            color: #2ecc71;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-link-new:hover {
+            color: #27ae60;
+            text-decoration: underline;
+        }
+
+        .password-toggle-new {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            z-index: 1;
+        }
+
+        .remember-row-new {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .remember-checkbox-new {
+            width: 18px;
+            height: 18px;
+            accent-color: #2ecc71;
+        }
+
+        .remember-label-new {
+            color: #34495e;
+            font-size: 0.9rem;
+        }
+
+        .login-btn-new {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .login-btn-new:hover {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .login-btn-new:hover i {
+            transform: translateX(5px);
+        }
+
+        .auth-divider-new {
+            text-align: center;
+            margin: 2rem 0 1.5rem;
+            position: relative;
+        }
+
+        .auth-divider-new::before,
+        .auth-divider-new::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 70px);
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .auth-divider-new::before {
+            left: 0;
+        }
+
+        .auth-divider-new::after {
+            right: 0;
+        }
+
+        .auth-divider-new span {
+            background: white;
+            padding: 0 1rem;
+            color: #95a5a6;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .social-login-new {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-btn-new {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #edf2f7;
+            background: white;
+            border-radius: 12px;
+            color: #34495e;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .social-btn-new:hover {
+            background: #f8f9fa;
+            border-color: #2ecc71;
+        }
+
+        .social-btn-new .fa-google {
+            color: #DB4437;
+        }
+
+        .social-btn-new .fa-facebook-f {
+            color: #4267B2;
+        }
+
+        .register-section-new {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .register-section-new p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .register-link-new {
+            color: #2ecc71;
+            text-decoration: none;
+            font-weight: 700;
+            margin-left: 5px;
+        }
+
+        .register-link-new:hover {
+            color: #27ae60;
+            text-decoration: underline;
+        }
+
+        .demo-note-new {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            border: 1px dashed #bdc3c7;
+        }
+
+        .demo-note-new strong {
+            color: #2ecc71;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none !important;
+            }
+            
+            .auth-card {
+                padding: 2rem !important;
+            }
+            
+            .social-login-new {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 1.5rem !important;
+            }
+            
+            .auth-title {
+                font-size: 1.5rem !important;
+            }
+        }
+    </style>
 </head>
-<body style="background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%); font-family: 'Poppins', sans-serif;">
+<body>
 
-    <nav class="navbar">
-        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
-            <div class="logo" style="font-weight: 700; color: #2ecc71; font-size: 1.5rem;">
-                <i class="fas fa-leaf"></i> CropAI
-            </div>
-            <ul class="nav-menu" style="display: flex; list-style: none; gap: 2rem;">
-                <li><a href="index.html" style="text-decoration: none; color: #34495e; font-weight: 500;">Back to Home</a></li>
-            </ul>
-        </div>
-    </nav>
+    
 
+    <!-- Original Auth Container (classes preserved) -->
     <main class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 85vh; padding: 1rem;">
         
+        <!-- Original Auth Card (classes preserved) -->
         <div class="auth-card" style="background: white; padding: 3rem; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid rgba(46, 204, 113, 0.1);">
             
-            <div style="text-align: center; margin-bottom: 2.5rem;">
-                <div style="width: 70px; height: 70px; background: #e8f5e9; color: #2ecc71; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem;">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <h2 style="color: #2c3e50; font-weight: 700; margin-bottom: 0.5rem;">Farmer Portal</h2>
-                <p style="color: #7f8c8d; font-size: 0.9rem;">Secure access to your agricultural data.</p>
+            <!-- New enhanced elements (won't conflict) -->
+            <div class="auth-icon-wrapper">
+                <i class="fas fa-lock"></i>
             </div>
 
-            <form id="login-form">
+            <h2 class="auth-title">Welcome Back</h2>
+            <p class="auth-subtitle-new">Farmer Portal • Secure Access</p>
+
+            <!-- Original form structure but with new classes -->
+            <form>
+                <!-- Email Field -->
                 <div style="margin-bottom: 1.5rem;">
-                    <label for="login-email" style="display: block; margin-bottom: 0.6rem; color: #34495e; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
-                    <div style="position: relative;">
-                        <i class="fas fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
-                        <input type="email" id="login-email" required placeholder="name@farm.com" 
-                            style="width: 100%; padding: 0.9rem 1rem 0.9rem 2.8rem; border: 2px solid #edf2f7; border-radius: 12px; font-family: inherit; transition: all 0.3s ease; outline: none; box-sizing: border-box;">
+                    <label class="form-label" style="display: block; margin-bottom: 0.6rem; color: #34495e; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
+                    <div class="input-wrapper-new">
+                        <i class="fas fa-envelope input-icon-new"></i>
+                        <input type="email" class="input-field-new" placeholder="farmer@cropai.com" value="farmer@demo.com">
                     </div>
                 </div>
                 
+                <!-- Password Field -->
                 <div style="margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
-                        <label for="login-password" style="color: #34495e; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
-                        <a href="#" style="font-size: 0.75rem; color: #2ecc71; text-decoration: none; font-weight: 600;">Forgot?</a>
+                    <div class="label-row-new">
+                        <label class="form-label" style="color: #34495e; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
+                        <a href="#" class="forgot-link-new">Forgot?</a>
                     </div>
-                    <div style="position: relative;">
-                        <i class="fas fa-key" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
-                        <input type="password" id="login-password" required placeholder="••••••••" 
-                            style="width: 100%; padding: 0.9rem 1rem 0.9rem 2.8rem; border: 2px solid #edf2f7; border-radius: 12px; font-family: inherit; transition: all 0.3s ease; outline: none; box-sizing: border-box;">
+                    <div class="input-wrapper-new">
+                        <i class="fas fa-key input-icon-new"></i>
+                        <input type="password" class="input-field-new" value="password123">
+                        <span class="password-toggle-new">
+                            <i class="far fa-eye-slash"></i>
+                        </span>
                     </div>
                 </div>
 
-                <button type="submit" id="login-btn" style="width: 100%; padding: 1.1rem; background: #2ecc71; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(46, 204, 113, 0.2);">
-                    Log In to Dashboard <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                <!-- Remember Me -->
+                <div class="remember-row-new">
+                    <input type="checkbox" id="remember" class="remember-checkbox-new" checked>
+                    <label for="remember" class="remember-label-new">Keep me logged in</label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="login-btn-new">
+                    <span>Access Dashboard</span>
+                    <i class="fas fa-arrow-right"></i>
                 </button>
             </form>
 
-            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px dashed #e2e8f0;">
-                <p style="color: #7f8c8d; font-size: 0.9rem;">
-                    New to CropAI? <a href="register.html" style="color: #2ecc71; text-decoration: none; font-weight: 700;">Create Farmer Account</a>
+            
+
+            <!-- Register Link -->
+            <div class="register-section-new">
+                <p>
+                    <i class="fas fa-seedling" style="color: #2ecc71;"></i>
+                    New to CropAI?
+                    <a href="register.html" class="register-link-new">Create Farmer Account</a>
                 </p>
+            </div>
+
+        
+
+            <!-- Original content preserved but hidden to avoid duplication -->
+            <div style="display: none;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <div style="width: 70px; height: 70px; background: #e8f5e9; color: #2ecc71; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem;">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h2 style="color: #2c3e50; font-weight: 700; margin-bottom: 0.5rem;">Farmer Portal</h2>
+                    <p style="color: #7f8c8d; font-size: 0.9rem;">Secure access to your agricultural data.</p>
+                </div>
             </div>
         </div>
         
     </main>
-
-    <script src="../js/auth.js"></script>
+     <script src="../js/auth.js"></script>
 </body>
 </html>
