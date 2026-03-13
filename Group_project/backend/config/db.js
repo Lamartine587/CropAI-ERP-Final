@@ -1,23 +1,27 @@
 const { Pool } = require('pg');
 const mongoose = require('mongoose');
-require('dotenv').config();
 
-const pgPool = new Pool({ connectionString: process.env.POSTGRES_URI });
+// Use the environment variable provided by Render/Neon
+const connectionString = process.env.DATABASE_URL;
+
+const pgPool = new Pool({
+    connectionString: connectionString,
+    ssl: {
+        // This is CRITICAL for Neon and Render cloud connections
+        rejectUnauthorized: false 
+    }
+});
 
 const connectDBs = async () => {
     try {
+        // Connect MongoDB
         await mongoose.connect(process.env.MONGO_URI);
         console.log('✅ MongoDB Connected (IoT & AI Data)');
 
-        await pgPool.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-        console.log('✅ PostgreSQL Connected (User Accounts)');
+        // Test PostgreSQL Connection
+        const client = await pgPool.connect();
+        console.log('✅ PostgreSQL Connected (Neon Cloud)');
+        client.release();
     } catch (err) {
         console.error('❌ Database Connection Error:', err);
         process.exit(1);
