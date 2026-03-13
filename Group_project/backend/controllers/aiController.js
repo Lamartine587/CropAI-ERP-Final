@@ -1,99 +1,139 @@
-// backend/controllers/aiController.js
-
-// ==========================================
-// 1. NODE V24 COMPATIBILITY FIX (POLYFILL)
-// ==========================================
-// This must stay at the very top. It prevents the 
-// "(0 , util_1.isNullOrUndefined) is not a function" crash.
-const util = require('util');
-if (typeof util.isNullOrUndefined !== 'function') {
-    util.isNullOrUndefined = function (obj) {
-        return obj === null || obj === undefined;
-    };
-}
-
-// ==========================================
-// 2. IMPORTS & SETUP
-// ==========================================
-const tf = require('@tensorflow/tfjs-node');
 const fs = require('fs');
-const path = require('path');
 const { Detection } = require('../models/mongoModels');
 
-let model;
-
-// --- Load the Local Model ---
-const loadModel = async () => {
-    try {
-        const modelPath = path.join(__dirname, '../ml_model/model.json');
-        const handler = tf.io.fileSystem(modelPath);
-        model = await tf.loadLayersModel(handler);
-        console.log('🧠 Local Edge AI Model Loaded Successfully');
-    } catch (error) {
-        console.warn('⚠️ Local AI Model missing. Please place model files in backend/ml_model/');
-    }
-};
-loadModel();
-
-// --- Define Classes ---
-// ⚠️ IMPORTANT: These must match the exact order you trained them in Teachable Machine!
-const CLASS_LABELS = [
-    { crop: "Maize", disease: "Healthy", status: "Healthy", treatments: ["Continue normal maintenance."] },
-    { crop: "Maize", disease: "Streak Virus", status: "Infected", treatments: ["Uproot infected plants", "Use resistant seed varieties"] },
-    { crop: "Tomato", disease: "Late Blight", status: "Infected", treatments: ["Apply copper-based fungicide", "Ensure good plant spacing"] }
-];
-
-// ==========================================
-// 3. MAIN ANALYSIS LOGIC
-// ==========================================
+/**
+ * 1. MULTI-MODAL IMAGE ANALYSIS
+ * Using Qwen3-VL from your available model list
+ */
 const analyzeCropImage = async (filePath, mimeType, userId = null) => {
     try {
-        if (!model) throw new Error("Local AI Model is offline.");
-
-        // Read image and convert to a Tensor (Matrix)
         const imageBuffer = fs.readFileSync(filePath);
-        const tfImage = tf.node.decodeImage(imageBuffer, 3); // 3 channels for RGB
+        const base64Image = imageBuffer.toString('base64');
 
-        // Teachable Machine models require 224x224 images
-        const resizedImage = tf.image.resizeBilinear(tfImage, [224, 224]);
-        const expandedImage = resizedImage.expandDims(0);
-        const normalizedImage = expandedImage.div(255.0); // Normalize pixels to 0-1
+        const prompt = `Identify the crop and disease in this photo. 
+        Return ONLY a raw JSON object: {"crop": "string", "disease": "string", "status": "Healthy|Infected", "confidence": 95, "treatments": ["step1", "step2"]}`;
 
-        // Run the prediction
-        const predictionsArray = await model.predict(normalizedImage).data();
-        
-        // Find the index with the highest probability
-        const highestProbIndex = predictionsArray.indexOf(Math.max(...predictionsArray));
-        
-        // Match the index to our labels array and clone it
-        const resultData = { ...CLASS_LABELS[highestProbIndex] };
-        
-        // Add a confidence score (e.g., 98)
-        resultData.confidence = Math.round(predictionsArray[highestProbIndex] * 100);
-
-        // Memory Cleanup (CRITICAL: Prevents memory leaks and server crashes)
-        tfImage.dispose();
-        resizedImage.dispose();
-        expandedImage.dispose();
-        normalizedImage.dispose();
-
-        // Save the result to MongoDB History
-        const detectionRecord = await Detection.create({
-            user_id: userId,
-            ...resultData
+        const response = await fetch('https://api.featherless.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.FEATHERLESS_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "Qwen/Qwen3-VL-30B-A3B-Instruct", // FIXED: Model from your list
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            { type: "text", text: prompt },
+                            { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}` } }
+                        ]
+                    }
+                ],
+                temperature: 0.1
+            })
         });
 
-        // Delete the temporary uploaded image file
+        const data = await response.json();
+
+        if (data.error) {
+            console.error("❌ Featherless Error:", data.error.message);
+            throw new Error(data.error.message);
+        }
+
+        let cleanContent = data.choices[0].message.content.trim();
+        cleanContent = cleanContent.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+        const aiResponse = JSON.parse(cleanContent);
+
+        const detectionRecord = await Detection.create({
+            user_id: userId,
+            ...aiResponse
+        });
+
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        
         return detectionRecord;
 
     } catch (error) {
-        // Ensure file is deleted even if analysis fails
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        console.error("Local AI Controller Error:", error.message);
-        throw new Error("Failed to process image through local AI.");
+        console.error("AI Controller Error:", error.message);
+        throw error;
     }
 };
 
-module.exports = { analyzeCropImage };
+/**
+ * 2. PREDICTIVE INSIGHTS
+ * Using DeepSeek V3.2 from your available model list
+ */
+const generatePersonalizedInsight = async (userCrops, sensorData, imageResult) => {
+    try {
+        const prompt = `Analyze: Crops: ${userCrops}, Temp: ${sensorData?.temperature}°C, Scan: ${imageResult.disease}. 
+        Return JSON ONLY: {"alertHeadline": "string", "expertRecommendation": "string", "futureRisk": "string"}`;
+
+        const response = await fetch('https://api.featherless.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.FEATHERLESS_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "deepseek-ai/DeepSeek-V3.2", // FIXED: Model from your list
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.2
+            })
+        });
+
+        const data = await response.json();
+        let cleanContent = data.choices[0].message.content.trim();
+        cleanContent = cleanContent.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+        return JSON.parse(cleanContent);
+    } catch (err) {
+        return null;
+    }
+};
+
+/**
+ * 3. ENVIRONMENTAL RISK PREDICTION
+ * Predicts disease based on IoT telemetry.
+ */
+const generateEnvironmentalRisk = async (crops, sensors) => {
+    try {
+        const prompt = `
+        Context: Agriculture sensor data.
+        - Crops in area: ${crops}
+        - Current Data: Temp ${sensors.temperature}°C, Humidity ${sensors.humidity}%, Soil Moisture ${sensors.soilMoisture}%
+        
+        Predict the most likely disease to occur in these conditions.
+        Return JSON ONLY: 
+        {
+            "riskLevel": "Low|Medium|High",
+            "predictedDisease": "string",
+            "likelyAffectedCrop": "string",
+            "expertRecommendation": "string",
+            "futureRisk": "Description of spread"
+        }`;
+
+        const response = await fetch('https://api.featherless.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.FEATHERLESS_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "deepseek-ai/DeepSeek-V3.2",
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.1
+            })
+        });
+
+        const data = await response.json();
+        let clean = data.choices[0].message.content.trim().replace(/```json/gi, '').replace(/```/g, '');
+        return JSON.parse(clean);
+    } catch (err) {
+        console.error("Prediction Error:", err);
+        return null;
+    }
+};
+
+module.exports = { analyzeCropImage, generatePersonalizedInsight };

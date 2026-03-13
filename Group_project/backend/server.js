@@ -20,15 +20,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /**
- * STATIC DIRECTORY
+ * 1. SERVE UPLOADS DIRECTORY (The Fix)
+ * This tells Express: "If a request starts with /uploads, 
+ * look inside the local 'uploads' folder for that file."
+ */
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+/**
+ * 2. STATIC DIRECTORY (Frontend)
  * Serves the 'frontend' folder as the root (/).
- * This allows navigation.js to fetch '/includes/portal.html'
  */
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Health Check for presentation
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'Connected', timestamp: new Date(), engine: 'Gemini 2.0 Flash' });
+    res.json({ 
+        status: 'Connected', 
+        timestamp: new Date(), 
+        engine: 'Llama 3 via Featherless' // Updated for your new AI pivot!
+    });
 });
 
 app.use('/api', apiRoutes);
@@ -39,5 +49,6 @@ const PORT = process.env.PORT || 5000;
 connectDBs().then(() => {
     app.listen(PORT, () => {
         console.log(`\n🚀 CropAI Server Running on http://localhost:${PORT}`);
+        console.log(`📂 Uploads enabled at: ${path.join(__dirname, 'uploads')}`);
     });
 });
