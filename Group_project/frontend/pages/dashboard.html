@@ -6,7 +6,125 @@
     <title>Dashboard | CropAI</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        :root {
+            --dash-bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --warning-orange: #f39c12;
+        }
+
+        body.dashboard {
+            background-color: var(--dash-bg);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .content {
+            padding: 2rem 3%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            background: var(--card-bg);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        /* --- Sensor Grid --- */
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sensor-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-left: 5px solid var(--accent-green);
+        }
+
+        .sensor-value { font-size: 2.2rem; font-weight: 700; color: var(--text-main); }
+
+        /* --- AI Prediction Styling --- */
+        .predictive-alert {
+            background: #fff5f5;
+            border-left: 6px solid var(--accent-red);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.1);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .detection-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .upload-area {
+            border: 2px dashed #bdc3c7;
+            border-radius: 15px;
+            padding: 3rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            background: #fafbfc;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white; border: none; padding: 12px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: 600;
+        }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 9999; display: flex; align-items: center; justify-content: center;
+        }
+
+        .modal-content {
+            background: #2c3e50; border-radius: 20px; padding: 2rem;
+            width: 90%; max-width: 450px; color: white;
+        }
+
+        @media (max-width: 991px) {
+            .main-content { margin-left: 0; }
+            .sensor-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sensor-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body class="dashboard">
 
@@ -14,74 +132,75 @@
 
     <main class="main-content">
         <header class="top-bar">
-            <div class="menu-toggle" id="toggleBtn"><i class="fas fa-bars"></i></div>
-            <div class="top-bar-actions">
-                <span class="auth-only" id="authStatus" style="display:none;"><i class="fas fa-check-circle"></i> Connected</span>
-            </div>
+            <div class="menu-toggle" id="toggleBtn" style="display:block;"><i class="fas fa-bars"></i></div>
+            <div id="authStatus"><i class="fas fa-satellite-dish"></i> Live Regional Feed</div>
         </header>
 
         <div class="content">
             <div class="welcome-section">
-                <h1 id="welcome-title">Welcome back, <span id="welcome-name" style="color: #2ecc71;">Farmer</span>! 👋</h1>
-                <p>Monitor real-time conditions and scan crops for diseases.</p>
+                <h1>Welcome, <span id="welcome-name" style="color: #2ecc71;">Farmer</span>!</h1>
+                <p>Regional AI Engine is monitoring conditions in your area.</p>
             </div>
 
             <div class="sensor-grid">
                 <div class="sensor-card">
-                    <h3><i class="fas fa-temperature-high"></i> Temperature</h3>
+                    <h3><i class="fas fa-temperature-high" style="color: #e74c3c;"></i> Temp</h3>
                     <div class="sensor-value" id="temperatureValue">--°C</div>
                 </div>
                 <div class="sensor-card">
-                    <h3><i class="fas fa-tint"></i> Soil Moisture</h3>
+                    <h3><i class="fas fa-tint" style="color: #3498db;"></i> Moisture</h3>
                     <div class="sensor-value" id="moistureValue">--%</div>
                 </div>
                 <div class="sensor-card">
-                    <h3><i class="fas fa-cloud"></i> Humidity</h3>
+                    <h3><i class="fas fa-cloud" style="color: #95a5a6;"></i> Humidity</h3>
                     <div class="sensor-value" id="humidityValue">--%</div>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                
                 <div class="detection-section">
-                    <h2><i class="fas fa-camera"></i> AI Scanner</h2>
+                    <h2><i class="fas fa-microscope"></i> AI Diagnostic Scanner</h2>
                     <div class="upload-area" id="uploadArea" onclick="document.getElementById('imageInput').click()">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Upload Leaf Image</p>
+                        <i class="fas fa-upload" style="font-size: 2rem; color: var(--accent-green);"></i>
+                        <p>Upload Leaf for Deep Analysis</p>
                     </div>
                     <input type="file" id="imageInput" accept="image/*" style="display: none;">
                     
-                    <div class="preview-container" id="previewContainer" style="display: none; text-align: center;">
-                        <img id="imagePreview" src="" style="max-width: 100%; border-radius: 15px; margin-bottom: 15px;">
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn-primary" style="flex: 2;" onclick="analyzeImage()">Analyze Now</button>
-                            <button class="btn-primary" style="flex: 1; background: #e74c3c;" onclick="resetUpload()">Cancel</button>
+                    <div id="previewContainer" style="display: none; margin-top: 20px; text-align: center;">
+                        <img id="imagePreview" src="" style="width: 100%; border-radius: 12px; margin-bottom: 15px;">
+                        <button class="btn-primary" style="width: 100%;" onclick="analyzeImage()">Run AI Scan</button>
+                    </div>
+                </div>
+
+                <div class="alerts-column">
+                    <h2 style="font-size: 1.1rem; margin-bottom: 1rem;"><i class="fas fa-shield-alt"></i> Intelligence Alerts</h2>
+                    <div id="alertsList">
+                        <div class="alert-box optimal" style="background: white; padding: 20px; border-radius: 15px; border: 1px solid #eee; text-align: center;">
+                            <i class="fas fa-sync fa-spin" style="color: var(--accent-green); margin-bottom: 10px;"></i>
+                            <p style="margin:0; color: #7f8c8d;">Syncing regional data...</p>
                         </div>
                     </div>
                 </div>
-                <div class="alerts-list" id="alertsList">
-                    </div>
+                
             </div>
         </div>
     </main>
 
     <div class="modal-overlay" id="analysisModal" style="display: none;">
         <div class="modal-content">
-            <div id="loading-spinner" style="text-align: center; padding: 40px;">
-                <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: #2ecc71;"></i>
-                <p style="margin-top: 20px; font-weight: 500; color: white;">Local Edge AI is analyzing your crop...</p>
+            <div id="loading-spinner" style="text-align: center;">
+                <i class="fas fa-brain fa-spin" style="font-size: 3rem; color: #2ecc71;"></i>
+                <p style="margin-top: 15px;">Featherless AI is processing image...</p>
             </div>
-
             <div id="analysisResult" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <h2 id="diseaseName" style="margin: 0; color: #2ecc71;">--</h2>
-                    <span id="severityBadge" class="severity">--</span>
+                <h2 id="diseaseName" style="color: var(--accent-green); margin-top: 0;">--</h2>
+                <div id="symptoms" style="font-size: 0.9rem; margin-bottom: 15px; color: #bdc3c7;"></div>
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+                    <h4 style="margin:0 0 10px 0; color: #f1c40f;"><i class="fas fa-lightbulb"></i> AI Recommendation:</h4>
+                    <div id="treatment" style="font-size: 0.85rem;"></div>
                 </div>
-                <p id="symptoms" style="margin: 15px 0; opacity: 0.8; color: white;"></p>
-                <div class="treatment-box" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; color: white;">
-                    <h4 style="margin-top: 0;"><i class="fas fa-medkit"></i> Recommended Actions:</h4>
-                    <div id="treatment"></div>
-                </div>
-                <button class="btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal()">Close Result</button>
+                <button class="btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal()">Dismiss</button>
             </div>
         </div>
     </div>

@@ -3,10 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Info | CropAI</title>
+    <title>Project Info | CropAI</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        /* =========================================
+           DASHBOARD BASE STYLES
+        ========================================= */
+        :root {
+            --dash-bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --accent-green: #2ecc71;
+            --accent-blue: #3498db;
+            --accent-purple: #9b59b6;
+            --accent-orange: #e67e22;
+        }
+
+        body.dashboard {
+            background-color: var(--dash-bg);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- Main Layout --- */
+        .main-content {
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            padding: 2rem 3%;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* --- Top Navigation Bar --- */
+        .top-bar {
+            background: var(--card-bg);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .menu-toggle {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            cursor: pointer;
+            display: none;
+        }
+
+        #authStatus {
+            background: #e8f5e9;
+            color: #27ae60;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- Info Section Styles --- */
+        .welcome-section {
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::after {
+            content: '\f05a'; /* FontAwesome Info Icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: -20px;
+            bottom: -40px;
+            font-size: 15rem;
+            color: rgba(255,255,255,0.05);
+            pointer-events: none;
+        }
+
+        .welcome-section h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+
+        .welcome-section p {
+            margin: 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        /* --- Architecture Grid --- */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .arch-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-top: 4px solid var(--accent-green);
+            transition: transform 0.3s ease;
+        }
+
+        .arch-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        .arch-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .arch-card h3 {
+            color: var(--text-main);
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+        }
+
+        .arch-card p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .arch-card ul {
+            margin: 15px 0 0 0;
+            padding-left: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .arch-card ul li {
+            margin-bottom: 8px;
+        }
+
+        /* Color Variations */
+        .arch-card.frontend { border-color: var(--accent-blue); }
+        .arch-card.frontend i { color: var(--accent-blue); }
+        
+        .arch-card.backend { border-color: var(--accent-green); }
+        .arch-card.backend i { color: var(--accent-green); }
+        
+        .arch-card.ai { border-color: var(--accent-purple); }
+        .arch-card.ai i { color: var(--accent-purple); }
+        
+        .arch-card.iot { border-color: var(--accent-orange); }
+        .arch-card.iot i { color: var(--accent-orange); }
+
+        /* --- Footer Info --- */
+        .info-footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--text-muted);
+            padding-top: 2rem;
+            border-top: 1px dashed #bdc3c7;
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN (TABLETS & PHONES)
+        ========================================= */
+        @media (max-width: 991px) {
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+        }
+
+        @media (max-width: 768px) {
+            .content { padding: 1.5rem 5%; }
+            .welcome-section { padding: 2rem 1.5rem; }
+            .welcome-section h1 { font-size: 1.8rem; }
+            .top-bar { padding: 0 1rem; }
+        }
+    </style>
 </head>
 <body class="dashboard">
 
@@ -15,18 +215,73 @@
     <main class="main-content">
         <header class="top-bar">
             <div class="menu-toggle" id="toggleBtn"><i class="fas fa-bars"></i></div>
-            <h2>Project Information</h2>
+            <div class="top-bar-actions">
+                <span class="auth-only" id="authStatus"><i class="fas fa-check-circle"></i> Connected</span>
+            </div>
         </header>
 
         <div class="content">
+            
             <div class="welcome-section">
-                <h1>System Overview</h1>
-                <p>Learn how our IoT nodes and AI Diagnostics work together.</p>
+                <h1>System Architecture</h1>
+                <p>Learn how our offline-capable AI Diagnostics and real-time IoT nodes work together to empower rural farmers.</p>
             </div>
-            <div class="sensor-card">
-                <h3>Technical Stack</h3>
-                <p>Built for the 2026 Build-with-AI Hackathon using Gemini 2.0 Flash and ESP32 nodes.</p>
+
+            <h2 style="color: #2c3e50; margin-bottom: 10px;"><i class="fas fa-layer-group" style="color: #2ecc71;"></i> Technical Stack</h2>
+            <p style="color: #7f8c8d; margin-top: 0;">Built for the 2026 Build-with-AI Hackathon.</p>
+
+            <div class="arch-grid">
+                
+                <div class="arch-card frontend">
+                    <i class="fab fa-html5"></i>
+                    <h3>Frontend Interface</h3>
+                    <p>A responsive, mobile-first web portal designed for farmers using entry-level smartphones in the field.</p>
+                    <ul>
+                        <li>HTML5 / CSS3 / Vanilla JS</li>
+                        <li>JWT Authentication Guard</li>
+                        <li>REST API Integration</li>
+                    </ul>
+                </div>
+
+                <div class="arch-card backend">
+                    <i class="fab fa-node-js"></i>
+                    <h3>Backend Servers</h3>
+                    <p>A robust hybrid database architecture ensuring secure user data and blazing-fast IoT telemetry logging.</p>
+                    <ul>
+                        <li>Node.js & Express API</li>
+                        <li>PostgreSQL (User Profiles & Auth)</li>
+                        <li>MongoDB (Sensor Logs & AI History)</li>
+                    </ul>
+                </div>
+
+                <div class="arch-card ai">
+                    <i class="fas fa-brain"></i>
+                    <h3>Local Edge AI</h3>
+                    <p>We pivoted to a zero-cost, offline-capable model to ensure farmers don't need expensive data bundles to scan crops.</p>
+                    <ul>
+                        <li>TensorFlow.js Node integration</li>
+                        <li>Offline matrix processing</li>
+                        <li>High-confidence disease classification</li>
+                    </ul>
+                </div>
+
+                <div class="arch-card iot">
+                    <i class="fas fa-microchip"></i>
+                    <h3>IoT Telemetry</h3>
+                    <p>Affordable field nodes that constantly monitor the soil and micro-climate, alerting the dashboard when conditions drop.</p>
+                    <ul>
+                        <li>ESP32 Microcontrollers</li>
+                        <li>Soil Moisture & DHT11 Sensors</li>
+                        <li>5-second polling intervals</li>
+                    </ul>
+                </div>
+
             </div>
+
+            <div class="info-footer">
+                <p><strong>CropAI</strong> • Engineered by Anga Systems • 2026</p>
+            </div>
+
         </div>
     </main>
 

@@ -10,11 +10,9 @@
 </head>
 <body>
 
-    <!-- FULL WIDTH NAVIGATION BAR -->
     <nav class="navbar">
         <div class="logo"><i class="fas fa-leaf"></i> CropAI</div>
         
-        <!-- Optional desktop navigation links -->
         <div class="nav-links">
             <a href="#home">Home</a>
             <a href="#features">Features</a>
@@ -24,21 +22,23 @@
         </div>
         
         <div id="nav-auth-status">
-            <!-- Dynamic content will be inserted here -->
+            <a href="pages/login.html"><i class="fas fa-user-circle"></i>Login</a> 
+            <a href="pages/register.html"><i class="fas fa-user-circle"></i>Sign Up</a> 
         </div>
     </nav>
 
-    <header class="hero" id="home">
-        <div class="hero-box">
-            <span style="color: rgb(43, 15, 15); font-weight: 800; letter-spacing: 2px; font-size: 2rem;">
+    <header class="hero" id="home" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=2070') center/cover no-repeat; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div class="hero-box" style="text-align: center; padding: 2rem;">
+            <span style="color: rgb(255, 255, 255); font-weight: 800; letter-spacing: 2px; font-size: 2rem;">
                 <i class="fas fa-microchip"></i> AI + IOT ECOSYSTEM
             </span>
-            <h1>Intelligence for a <br><span style="color: var(--primary-green);">Sustainable Harvest</span></h1>
-            <p> <span style="color:white; font-size: 2rem; font-weight: 600; font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;" >Empowering small-holder farmers with Gemini 2.0 Vision and IoT telemetry to diagnose diseases and optimize field conditions in real-time.</span></p>
+            <h1 style="color: white; font-size: 4rem; margin: 20px 0;">Intelligence for a <br><span style="color: #2ecc71;">Sustainable Harvest</span></h1>
+            <p> <span style="color:#e0e0e0; font-size: 1.5rem; font-weight: 400; font-family: 'Poppins', sans-serif; max-width: 800px; display: inline-block;">Empowering small-holder farmers with Local Edge AI and IoT telemetry to diagnose diseases and optimize field conditions entirely offline.</span></p>
+            <br>
+            <a href="pages/register.html" class="cta-btn" style="margin-top: 30px; display: inline-block; font-size: 1.2rem; padding: 15px 30px;">Get Started Free <i class="fas fa-arrow-right"></i></a>
         </div>
     </header>
 
-    <!-- Statistics Ribbon -->
     <div class="cropai-stats-ribbon">
         <div class="cropai-stat-block">
             <div class="cropai-stat-number">50K+</div>
@@ -65,7 +65,7 @@
                 <h3>Instant Diagnostic</h3>
                 <p>Launch the public scanner to identify crop diseases instantly using AI. No login required for field checks.</p>
             </div>
-            <a href="pages/dashboard.html" class="cta-btn">Start Scanning <i class="fas fa-arrow-right"></i></a>
+            <a href="pages/public-scanner.html" class="cta-btn">Start Scanning <i class="fas fa-arrow-right"></i></a>
         </div>
 
         <div class="nav-card">
@@ -90,7 +90,6 @@
         </div>
     </section>
 
-    <!-- Crop Showcase Carousel -->
     <div class="cropai-showcase" id="features">
         <div class="cropai-section-header">
             <h2>Supported Crops</h2>
@@ -130,7 +129,6 @@
         </div>
     </div>
 
-    <!-- Feature Strip -->
     <div class="cropai-feature-strip" id="how-it-works">
         <div class="cropai-feature-item">
             <i class="fas fa-satellite-dish"></i>
@@ -138,27 +136,25 @@
         </div>
         <div class="cropai-feature-item">
             <i class="fas fa-brain"></i>
-            <div class="cropai-feature-text">Gemini 2.0 Vision <small>AI diagnosis</small></div>
+            <div class="cropai-feature-text">TensorFlow Edge AI <small>Offline diagnosis</small></div>
         </div>
         <div class="cropai-feature-item">
             <i class="fas fa-cloud-upload-alt"></i>
-            <div class="cropai-feature-text">Edge computing <small>Offline mode</small></div>
+            <div class="cropai-feature-text">Local computing <small>Zero data costs</small></div>
         </div>
-        
     </div>
 
     <section style="padding: 100px 5%; background: rgba(255,255,255,0.02);" id="about">
         <div style="max-width: 800px; margin: 0 auto; text-align: center;">
             <h2 style="font-size: 2.5rem; margin-bottom: 20px;">The Digital Green Revolution</h2>
             <p style="color: var(--soft-slate); line-height: 1.8;">
-                By combining affordable IoT sensors with cutting-edge Generative AI, we provide farmers with a level of precision 
+                By combining affordable IoT sensors with cutting-edge Local Edge AI, we provide farmers with a level of precision 
                 previously reserved for industrial-scale agriculture. Our system directly supports <strong>SDG 2: Zero Hunger</strong> 
-                by reducing crop loss and protecting the livelihoods of food producers.
+                by reducing crop loss and protecting the livelihoods of food producers without relying on expensive cloud APIs.
             </p>
         </div>
     </section>
 
-    <!-- Testimonials -->
     <div class="cropai-testimonial-zone">
         <div class="cropai-farmer-card">
             <div class="cropai-quote-icon"><i class="fas fa-quote-right"></i></div>
@@ -178,24 +174,23 @@
                 <i class="fas fa-user-circle"></i>
                 <div>
                     <div class="cropai-farmer-name">Brian P.</div>
-                    <div class="cropai-farmer-location">Ahero, kenya</div>
+                    <div class="cropai-farmer-location">Ahero, Kenya</div>
                 </div>
             </div>
         </div>
         <div class="cropai-farmer-card">
             <div class="cropai-quote-icon"><i class="fas fa-quote-right"></i></div>
-            <p>"Finally, AI that understands local farming. The treatment recommendations actually work."</p>
+            <p>"Finally, AI that works offline without spending data bundles. The treatment recommendations actually work."</p>
             <div class="cropai-farmer-profile">
                 <i class="fas fa-user-circle"></i>
                 <div>
                     <div class="cropai-farmer-name">Carlos M.</div>
-                    <div class="cropai-farmer-location">Nyeri,Kenya</div>
+                    <div class="cropai-farmer-location">Nyeri, Kenya</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Newsletter -->
     <div class="cropai-newsletter-panel" id="contact">
         <h3>Stay Connected</h3>
         <p>Get weekly farming tips, disease alerts, and IoT updates directly to your inbox.</p>

@@ -3,17 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>History | CropAI</title>
+    <title>Diagnostic History | CropAI</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="../css/style.css">
+    
     <style>
-        /* Table-to-Card Responsive CSS */
+        /* =========================================
+           DASHBOARD BASE STYLES
+        ========================================= */
+        :root {
+            --dash-bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --accent-green: #2ecc71;
+        }
+
+        body.dashboard {
+            background-color: var(--dash-bg);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- Main Layout --- */
+        .main-content {
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            padding: 2rem 3%;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* --- Top Navigation Bar --- */
+        .top-bar {
+            background: var(--card-bg);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .menu-toggle {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            cursor: pointer;
+            display: none;
+        }
+
+        #authStatus {
+            background: #e8f5e9;
+            color: #27ae60;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- Welcome Section --- */
+        .welcome-section {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-text h1 {
+            color: var(--text-main);
+            margin: 0 0 5px 0;
+            font-size: 2rem;
+        }
+
+        .welcome-text p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* --- History Table Container --- */
+        .history-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            padding: 1rem;
+            text-align: left;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 2px solid #edf2f7;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .history-table td {
+            padding: 1rem;
+            color: var(--text-main);
+            border-bottom: 1px solid #edf2f7;
+            font-size: 0.95rem;
+        }
+
+        .history-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .history-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN (TABLETS & PHONES)
+        ========================================= */
+
+        /* Tablets */
+        @media (max-width: 991px) {
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+        }
+
+        /* Phones - Transform Table into Cards */
         @media (max-width: 768px) {
-            .history-table thead { display: none; }
-            .history-table tr { display: block; background: var(--card-bg); margin-bottom: 1rem; padding: 10px; border-radius: 10px; }
-            .history-table td { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.05); padding: 8px 0; }
-            .history-table td::before { content: attr(data-label); font-weight: 600; color: var(--primary-color); }
+            .content { padding: 1.5rem 5%; }
+            .welcome-text h1 { font-size: 1.5rem; }
+            .top-bar { padding: 0 1rem; }
+            
+            .history-container { padding: 1rem; background: transparent; box-shadow: none; }
+            
+            .history-table thead { display: none; } /* Hide headers */
+            
+            .history-table tr { 
+                display: block; 
+                background: var(--card-bg); 
+                margin-bottom: 1.5rem; 
+                padding: 1.2rem; 
+                border-radius: 12px; 
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                border-left: 4px solid var(--accent-green);
+            }
+            
+            .history-table td { 
+                display: flex; 
+                justify-content: space-between; 
+                align-items: center;
+                border-bottom: 1px dashed #edf2f7; 
+                padding: 10px 0; 
+            }
+            
+            .history-table td:last-child { border-bottom: none; }
+            
+            /* The pseudo-element trick you created, styled perfectly */
+            .history-table td::before { 
+                content: attr(data-label); 
+                font-weight: 600; 
+                color: var(--text-muted); 
+                font-size: 0.85rem;
+                text-transform: uppercase;
+            }
         }
     </style>
 </head>
@@ -24,24 +198,41 @@
     <main class="main-content">
         <header class="top-bar">
             <div class="menu-toggle" id="toggleBtn"><i class="fas fa-bars"></i></div>
-            <h2>Diagnostic History</h2>
+            <div class="top-bar-actions">
+                <span class="auth-only" id="authStatus"><i class="fas fa-check-circle"></i> Connected</span>
+            </div>
         </header>
 
         <div class="content">
-            <div class="sensor-card" style="padding: 0; overflow: hidden;">
-                <table class="history-table" style="width: 100%;">
+            
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h1><i class="fas fa-history" style="color: #2ecc71; margin-right: 10px;"></i> Scan History</h1>
+                    <p>Review your past crop disease diagnoses and treatments.</p>
+                </div>
+            </div>
+
+            <div class="history-container">
+                <table class="history-table">
                     <thead>
-                        <tr style="background: rgba(0,0,0,0.02);">
-                            <th style="padding: 1rem; text-align: left;">Date</th>
-                            <th style="padding: 1rem; text-align: left;">Crop</th>
-                            <th style="padding: 1rem; text-align: left;">Diagnosis</th>
-                            <th style="padding: 1rem; text-align: left;">Status</th>
+                        <tr>
+                            <th>Date</th>
+                            <th>Crop</th>
+                            <th>Diagnosis</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="historyBody"></tbody>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 3rem;">
+                                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: #2ecc71;"></i>
+                                <p style="margin-top: 15px; color: #7f8c8d;">Syncing data from edge nodes...</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
-                <div id="noHistory" style="display:none; text-align:center; padding: 3rem;">No records found.</div>
             </div>
+
         </div>
     </main>
 

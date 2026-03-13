@@ -6,7 +6,254 @@
     <title>Hardware | CropAI</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        /* =========================================
+           DASHBOARD BASE STYLES
+        ========================================= */
+        :root {
+            --dash-bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+        }
+
+        body.dashboard {
+            background-color: var(--dash-bg);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- Main Layout --- */
+        .main-content {
+            margin-left: 260px; /* Space for the desktop sidebar */
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            padding: 2rem 3%;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* --- Top Navigation Bar --- */
+        .top-bar {
+            background: var(--card-bg);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .menu-toggle {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            cursor: pointer;
+            display: none;
+        }
+
+        #authStatus {
+            background: #e8f5e9;
+            color: #27ae60;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- Welcome Section --- */
+        .welcome-section {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-text h1 {
+            color: var(--text-main);
+            margin: 0 0 5px 0;
+            font-size: 2rem;
+        }
+
+        .welcome-text p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* --- Sensor Grid --- */
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sensor-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-left: 5px solid #bdc3c7; /* Default gray edge */
+        }
+
+        .sensor-card.active { border-color: var(--accent-green); }
+        .sensor-card.warning { border-color: #f1c40f; }
+
+        .sensor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .sensor-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .sensor-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* --- Device List Area --- */
+        .detection-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .detection-section h2 {
+            margin-top: 0;
+            color: var(--text-main);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 15px;
+        }
+
+        /* Enhanced Device Item Card */
+        .device-card {
+            background: #fafbfc;
+            border: 1px solid #edf2f7;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .device-card:hover {
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-color: var(--accent-green);
+        }
+
+        .device-info h4 {
+            margin: 0 0 5px 0;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .device-info p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .device-status {
+            background: #e8f5e9;
+            color: #2ecc71;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            transform: translateY(-2px);
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN (TABLETS & PHONES)
+        ========================================= */
+
+        /* Tablets */
+        @media (max-width: 991px) {
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .sensor-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Phones */
+        @media (max-width: 768px) {
+            .content { padding: 1.5rem 5%; }
+            .welcome-text h1 { font-size: 1.5rem; }
+            .sensor-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .top-bar { padding: 0 1rem; }
+            
+            /* Stack the device card info on phones */
+            .device-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .device-status {
+                width: 100%;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+        }
+    </style>
 </head>
 <body class="dashboard">
 
@@ -21,29 +268,55 @@
         </header>
 
         <div class="content">
+            
             <div class="welcome-section">
-                <h1>Hardware Inventory</h1>
-                <p>Manage your ESP32 IoT nodes and field sensors.</p>
+                <div class="welcome-text">
+                    <h1>Hardware Inventory</h1>
+                    <p>Manage your ESP32 IoT nodes and field sensors.</p>
+                </div>
+                <button class="btn-primary" onclick="alert('Demo Mode: Pairing new ESP32 node...')">
+                    <i class="fas fa-plus"></i> Add Device
+                </button>
             </div>
 
             <div class="sensor-grid">
-                <div class="sensor-card">
-                    <h3>Active Nodes</h3>
+                <div class="sensor-card active">
+                    <h3><i class="fas fa-microchip" style="color: #2ecc71;"></i> Active Nodes</h3>
                     <div class="sensor-value" id="active-count">1</div>
+                </div>
+                <div class="sensor-card">
+                    <h3><i class="fas fa-exclamation-circle" style="color: #e74c3c;"></i> Offline Nodes</h3>
+                    <div class="sensor-value" id="offline-count">0</div>
+                </div>
+                <div class="sensor-card warning">
+                    <h3><i class="fas fa-battery-three-quarters" style="color: #f1c40f;"></i> Avg Battery</h3>
+                    <div class="sensor-value" id="battery-avg">86%</div>
                 </div>
             </div>
 
-            <div class="detection-section" style="margin-top: 2rem;">
-                <h2>Device List</h2>
-                <div class="alert-item" style="border-left: 4px solid #2ecc71; background: rgba(46, 204, 113, 0.05); padding: 20px; border-radius: 12px; margin-top: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="margin: 0;">ESP32-Node-01 (Main Field)</h4>
-                            <p style="margin: 5px 0 0; font-size: 0.9rem; opacity: 0.8;">Last heartbeat: Just now</p>
-                        </div>
-                        <span style="color: #2ecc71; font-weight: 600;"><i class="fas fa-signal"></i> Online</span>
+            <div class="detection-section">
+                <h2><i class="fas fa-server"></i> Deployed Devices</h2>
+                
+                <div class="device-card">
+                    <div class="device-info">
+                        <h4><i class="fas fa-satellite-dish" style="color: #7f8c8d;"></i> ESP32-Node-01 <span style="font-size: 0.8rem; background: #edf2f7; padding: 2px 8px; border-radius: 10px; color: #34495e;">Main Field</span></h4>
+                        <p>MAC: 24:6F:28:AE:9C:14 • Last heartbeat: Just now</p>
+                    </div>
+                    <div class="device-status">
+                        <i class="fas fa-signal"></i> Online
                     </div>
                 </div>
+                
+                <div class="device-card" style="border-left-color: #bdc3c7; opacity: 0.7;">
+                    <div class="device-info">
+                        <h4><i class="fas fa-satellite-dish" style="color: #7f8c8d;"></i> ESP32-Node-02 <span style="font-size: 0.8rem; background: #edf2f7; padding: 2px 8px; border-radius: 10px; color: #34495e;">Storage Unit</span></h4>
+                        <p>MAC: 24:6F:28:BE:1C:88 • Last heartbeat: 14 days ago</p>
+                    </div>
+                    <div class="device-status" style="background: #f8f9fa; color: #95a5a6;">
+                        <i class="fas fa-power-off"></i> Offline
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>

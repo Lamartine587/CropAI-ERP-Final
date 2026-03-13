@@ -14,19 +14,24 @@
             <li id="nav-hardware" class="auth-only" style="display:none;">
                 <a href="hardware.html"><i class="fas fa-microchip"></i> My Hardware</a>
             </li>
+
+            <li id="nav-profile" class="auth-only" style="display:none;">
+                <a href="profile.html"><i class="fas fa-user-cog"></i> My Profile</a>
+            </li>
             
             <li id="nav-info"><a href="info.html"><i class="fas fa-info-circle"></i> Project Info</a></li>
+            
         
         </ul>
     </nav>
     
     <div class="sidebar-footer">
-        <button class="theme-toggle" id="themeToggle">
+        <button class="theme-toggle" id="themeToggle" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
             <i class="fas fa-moon"></i> <span class="theme-text">Dark Mode</span>
         </button>
         
-        <div class="auth-only" style="display: none; margin-top: 10px;">
-            <button id="logout-btn" class="logout-btn">
+        <div class="auth-only" style="display: none; margin-top: 15px;">
+            <button id="logout-btn" class="logout-btn" style="background: #e74c3c; border: none; color: white; padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </div>
@@ -63,7 +68,7 @@
 
     .logo { color: var(--leaf-green); font-size: 1.5rem; font-weight: 700; }
 
-    .sidebar-nav ul { list-style: none; padding: 10px 0; }
+    .sidebar-nav ul { list-style: none; padding: 10px 0; margin: 0; }
     
     .sidebar-nav li a {
         padding: 1rem 2rem;
@@ -73,6 +78,7 @@
         color: rgba(255,255,255,0.8);
         text-decoration: none;
         border-left: 4px solid transparent;
+        transition: all 0.2s ease;
     }
 
     .sidebar-nav li a:hover, .sidebar-nav li.active a {
@@ -81,10 +87,21 @@
         border-left-color: var(--leaf-green);
     }
 
+    /* Mobile Overlay */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+        display: none;
+    }
+
     /* Mobile Styles */
     @media (max-width: 992px) {
         .sidebar { transform: translateX(-100%); }
         .sidebar.open { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        .sidebar-overlay.open { display: block; }
         .mobile-close { cursor: pointer; font-size: 1.2rem; }
     }
 
