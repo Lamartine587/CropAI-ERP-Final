@@ -1,0 +1,12 @@
+🌾 CropAI: Regional Predictive Agriculture ERPCropAI is an advanced AI-driven Enterprise Resource Planning (ERP) system designed to transform traditional farming into Climate-Smart Agriculture. By combining real-time IoT telemetry with multi-modal Vision AI, the system doesn't just diagnose diseases—it predicts regional outbreaks before they happen.🚀 Core Features1. Multi-Modal AI DiagnosticsPowered by the Qwen3-VL 30B Vision model, CropAI analyzes high-resolution crop imagery to identify diseases with over 95% confidence. It provides immediate treatment steps, acting as a digital agricultural pathologist in the palm of a farmer's hand.2. Regional Predictive IntelligenceUtilizing DeepSeek V3.2, the system analyzes real-time IoT data (Temperature, Humidity, Soil Moisture) to detect "Environmental Disease Signatures."Proactive Alerts: If conditions favor a disease (e.g., Late Blight), the system predicts the risk.Regional Broadcast: Once a threat is detected, the system automatically broadcasts prevention alerts to all registered farmers within the same geographical region (PostgreSQL-backed spatial logic).3. Smart Farm ERP DashboardReal-time Gauges: Visualized telemetry from IoT sensors.Personalized Insights: Context-aware recommendations based on the specific crops a farmer has planted.History Tracking: A MongoDB-backed history of all previous scans and environmental logs.🛠️ The Tech StackComponentTechnologyFrontendVanilla JS, HTML5, CSS3 (Mobile-First)BackendNode.js, Express.jsUser DataPostgreSQL (Relational/Profiles)IoT & LogsMongoDB (Document/Time-series)AI EngineFeatherless.ai (Qwen3-VL & DeepSeek V3.2)SecurityJWT, BcryptJS, Multi-layer Auth Middleware📦 Installation & SetupPrerequisitesNode.js (v24+)PostgreSQL & MongoDB instancesFeatherless.ai API KeyStepsClone the Repository:Bashgit clone https://github.com/lamartine587/CropAI-ERP-Final.git
+cd CropAI-ERP-Final
+Install Dependencies:Bashcd Group_project/backend
+npm install
+Environment Setup:Create a .env file in the backend folder:Code snippetPORT=5000
+PG_USER=your_user
+PG_PASSWORD=your_password
+MONGO_URI=your_mongo_uri
+JWT_SECRET=your_secret
+FEATHERLESS_API_KEY=your_key
+Run the App:Bashnpm start
+🛡️ DevOps StandardsThis repository follows professional development standards:.gitignore Implementation: No environment-specific binaries or sensitive .env files are pushed to the cloud.Branching Strategy: Feature-based development (e.g., don-backend-updates).Clean History: Scrubbed of heavy binaries to ensure fast cloning and platform-agnostic builds.
