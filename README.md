@@ -1,4 +1,3 @@
-```markdown
 # 🌾 CropAI: Regional Predictive Agriculture ERP
 
 **CropAI** is an advanced AI-driven Enterprise Resource Planning (ERP) system designed to transform traditional farming into **Climate-Smart Agriculture**. By combining real-time IoT telemetry with multi-modal Vision AI, the system doesn't just diagnose diseases—it predicts regional outbreaks before they happen.
@@ -48,8 +47,6 @@ Utilizing **DeepSeek V3.2**, the system analyzes real-time IoT data (Temperature
 git clone [https://github.com/lamartine587/CropAI-ERP-Final.git](https://github.com/lamartine587/CropAI-ERP-Final.git)
 cd CropAI-ERP-Final/Group_project/backend
 npm install
-
-```
 
 ### 3. Database Setup (PostgreSQL)
 
