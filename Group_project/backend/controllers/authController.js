@@ -1,60 +1,138 @@
-// backend/controllers/authController.js
-const bcrypt = require('bcryptjs'); // or 'bcrypt'
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { pgPool } = require('../config/db'); 
 const sendVerificationEmail = require('../utils/sendEmail');
 
+/**
+ * REGISTER FARMER
+ */
 exports.register = async (req, res) => {
-    // Assuming your frontend register.html now also sends 'fullName'
     const { fullName, email, password } = req.body; 
     
-    // Grab a dedicated client from the pool for the transaction
+    // 1. Basic validation
+    if (!fullName || !email || !password) {
+        return res.status(400).json({ error: "Please provide all required fields." });
+    }
+
     const client = await pgPool.connect();
 
     try {
         await client.query('BEGIN'); // Start Transaction
 
-        // 1. Hash password
+        // 2. Hash password
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, salt);
 
-        // 2. Insert into users table (Added is_verified = false)
+        // 3. Insert into users table
+        // We set is_verified to false. (Change to true if you want to skip verification for the demo)
         const userResult = await client.query(
             'INSERT INTO users (email, password_hash, is_verified) VALUES ($1, $2, $3) RETURNING id',
-            [email, hash, false]
+            [email.toLowerCase(), hash, false]
         );
         const userId = userResult.rows[0].id;
 
-        // 3. Insert into profiles table
+        // 4. Insert into profiles table
         await client.query(
             'INSERT INTO profiles (user_id, full_name) VALUES ($1, $2)',
             [userId, fullName]
         );
 
-        // 4. Commit the transaction to unlock the database quickly
+        // 5. COMMIT early! This ensures the user is saved even if the email fails later.
         await client.query('COMMIT'); 
 
-        // 5. Generate Token & Send Email
+        // 6. Generate Verification Token
         const verificationToken = jwt.sign(
             { id: userId },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
-        // Await the email sending process
-        await sendVerificationEmail(email, verificationToken);
+        // 7. Build full Verification URL
+        const verificationUrl = `${req.protocol}://${req.get('host')}/api/auth/verify?token=${verificationToken}`;
+
+        // 8. Send Email in the background (No 'await' here)
+        sendVerificationEmail(email, verificationUrl).catch(mailErr => {
+            console.error("⚠️ Background Mail Error (User still created):", mailErr.message);
+        });
 
         res.status(201).json({ 
-            message: "Farmer account created! Please check your email to verify your account." 
+            message: "Account created! Please check your email to verify." 
         });
 
     } catch (err) {
-        // If ANYTHING above fails (like a duplicate email), undo all database changes
         await client.query('ROLLBACK');
-        console.error("Registration Error:", err.message);
-        res.status(500).json({ error: "Registration failed. Email might already exist." });
+        console.error("❌ Registration Error:", err.message);
+        
+        const errorMsg = err.code === '23505' 
+            ? "This email is already registered." 
+            : "Registration failed. Please try again.";
+            
+        res.status(500).json({ error: errorMsg });
     } finally {
-        // ALWAYS release the client back to the pool to prevent memory leaks
         client.release();
+    }
+};
+
+/**
+ * LOGIN FARMER
+ */
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const result = await pgPool.query('SELECT * FROM users WHERE email = $1', [email.toLowerCase()]);
+        const user = result.rows[0];
+
+        if (!user) return res.status(400).json({ error: "Invalid credentials." });
+
+        // Check password
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) return res.status(400).json({ error: "Invalid credentials." });
+
+        // HACKATHON OVERRIDE: 
+        // If you want to bypass verification for the demo, comment out this block:
+        /*
+        if (!user.is_verified) {
+            return res.status(401).json({ error: "Please verify your email before logging in." });
+        }
+        */
+
+        // Generate Session Token
+        const token = jwt.sign(
+            { id: user.id }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '24h' }
+        );
+
+        res.json({ token, message: "Welcome back!" });
+
+    } catch (err) {
+        console.error("Login Error:", err.message);
+        res.status(500).json({ error: "Server error during login." });
+    }
+};
+
+/**
+ * VERIFY EMAIL
+ */
+exports.verifyEmail = async (req, res) => {
+    const { token } = req.query;
+
+    if (!token) return res.status(400).send("Verification token is missing.");
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        await pgPool.query(
+            'UPDATE users SET is_verified = true WHERE id = $1', 
+            [decoded.id]
+        );
+
+        // Redirect back to login with a success flag
+        res.redirect('/pages/login.html?verified=true');
+
+    } catch (err) {
+        console.error("Verification Error:", err.message);
+        res.status(400).send("Invalid or expired verification link.");
     }
 };
