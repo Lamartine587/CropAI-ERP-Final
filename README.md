@@ -47,9 +47,9 @@ Utilizing **DeepSeek V3.2**, the system analyzes real-time IoT data (Temperature
 git clone [https://github.com/lamartine587/CropAI-ERP-Final.git](https://github.com/lamartine587/CropAI-ERP-Final.git)
 cd CropAI-ERP-Final/Group_project/backend
 npm install
-
+```
 ### 3. Database Setup (PostgreSQL)
-
+```bash
 CREATE DATABASE crop_dp;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
