@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropAI | Agricultural Intelligence & Disease Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary-green: #2ecc71;
+            --deep-navy: #0f172a;
+            --soft-slate: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--deep-navy);
+            color: #f8fafc;
+            margin: 0;
+            scroll-behavior: smooth;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            padding: 1.5rem 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 80%;
+            z-index: 1000;
+        }
+
+        .logo { font-weight: 700; font-size: 1.5rem; color: var(--primary-green); display: flex; align-items: center; gap: 10px; }
+
+        /* --- HERO --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top right, rgba(46, 204, 113, 0.1), transparent),
+                        url('https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=2070') center/cover;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero-box { max-width: 900px; }
+        .hero-box h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1; margin-bottom: 1.5rem; }
+        .hero-box p { font-size: 1.2rem; color: var(--soft-slate); margin-bottom: 3rem; }
+
+        /* --- CARDS GRID --- */
+        .hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 50px 10%;
+            margin-top: -120px;
+        }
+
+        .nav-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 24px;
+            text-decoration: none;
+            color: white;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-12px);
+            border-color: var(--primary-green);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .nav-card i { font-size: 2.5rem; color: var(--primary-green); margin-bottom: 20px; }
+        .nav-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
+        .nav-card p { font-size: 0.9rem; color: var(--soft-slate); margin-bottom: 25px; line-height: 1.6; }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .cta-btn {
+            padding: 10px 20px;
+            background: var(--primary-green);
+            color: var(--deep-navy);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .cta-btn.outline {
+            background: transparent;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .cta-btn:hover { opacity: 0.8; transform: scale(1.05); }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 80px 10% 40px;
+            text-align: center;
+            background: #080d1a;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .anga-faint {
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            opacity: 0.15;
+            margin-top: 40px;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-leaf"></i> CropAI</div>
+        <div id="nav-auth-status">
+            </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-box">
+            <span style="color: var(--primary-green); font-weight: 600; letter-spacing: 2px; font-size: 0.8rem;">
+                <i class="fas fa-microchip"></i> AI + IOT ECOSYSTEM
+            </span>
+            <h1>Intelligence for a <br><span style="color: var(--primary-green);">Sustainable Harvest</span></h1>
+            <p>Empowering small-holder farmers with Gemini 2.0 Vision and IoT telemetry to diagnose diseases and optimize field conditions in real-time.</p>
+        </div>
+    </header>
+
+    <section class="hub-grid">
+        <div class="nav-card">
+            <div>
+                <i class="fas fa-bolt"></i>
+                <h3>Instant Diagnostic</h3>
+                <p>Launch the public scanner to identify crop diseases instantly using AI. No login required for field checks.</p>
+            </div>
+            <a href="pages/dashboard.html" class="cta-btn">Start Scanning <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="nav-card">
+            <div>
+                <i class="fas fa-user-shield"></i>
+                <h3>Farmer Portal</h3>
+                <p>Create an account to save your scan history, track seasonal trends, and manage your IoT hardware inventory.</p>
+            </div>
+            <div class="btn-group">
+                <a href="pages/login.html" class="cta-btn outline">Login</a>
+                <a href="pages/register.html" class="cta-btn">Sign Up</a>
+            </div>
+        </div>
+
+        <div class="nav-card">
+            <div>
+                <i class="fas fa-project-diagram"></i>
+                <h3>Technical Stack</h3>
+                <p>Explore our architecture: Node.js, PostgreSQL for users, MongoDB for IoT logs, and ESP32 hardware nodes.</p>
+            </div>
+            <a href="pages/info.html" class="cta-btn outline">View Docs</a>
+        </div>
+    </section>
+
+    <section style="padding: 100px 10%; background: rgba(255,255,255,0.02);">
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">The Digital Green Revolution</h2>
+            <p style="color: var(--soft-slate); line-height: 1.8;">
+                By combining affordable IoT sensors with cutting-edge Generative AI, we provide farmers with a level of precision 
+                previously reserved for industrial-scale agriculture. Our system directly supports <strong>SDG 2: Zero Hunger</strong> 
+                by reducing crop loss and protecting the livelihoods of food producers.
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <p style="font-size: 0.9rem; opacity: 0.6;">&copy; 2026 CropAI Detection | Built for Build-with-AI Hackathon</p>
+        <div class="anga-faint">Engineered by Anga Systems</div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const statusDiv = document.getElementById('nav-auth-status');
+            
+            if (token) {
+                statusDiv.innerHTML = `<a href="pages/dashboard.html" style="color: var(--primary-green); text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-user-circle"></i> Connected
+                </a>`;
+            } else {
+                statusDiv.innerHTML = `<a href="pages/login.html" style="color: white; text-decoration: none;">Login</a>`;
+            }
+        });
+    </script>
+</body>
+</html>

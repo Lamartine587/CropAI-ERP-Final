@@ -1,0 +1,98 @@
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<aside class="sidebar" id="mainSidebar">
+    <div class="sidebar-header">
+        <div class="logo"><i class="fas fa-leaf"></i> CropAI</div>
+        <div class="mobile-close" id="mobileClose"><i class="fas fa-times"></i></div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul>
+            <li id="nav-dashboard"><a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li id="nav-history"><a href="history.html"><i class="fas fa-history"></i> Scan History</a></li>
+            
+            <li id="nav-hardware" class="auth-only" style="display:none;">
+                <a href="hardware.html"><i class="fas fa-microchip"></i> My Hardware</a>
+            </li>
+            
+            <li id="nav-info"><a href="info.html"><i class="fas fa-info-circle"></i> Project Info</a></li>
+        
+        </ul>
+    </nav>
+    
+    <div class="sidebar-footer">
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i> <span class="theme-text">Dark Mode</span>
+        </button>
+        
+        <div class="auth-only" style="display: none; margin-top: 10px;">
+            <button id="logout-btn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+</aside>
+
+<style>
+    /* GREEN THEME VARIABLES */
+    :root { 
+        --forest-green: #1b4332; 
+        --leaf-green: #2ecc71; 
+    }
+
+    .sidebar {
+        background: var(--forest-green);
+        color: white;
+        width: 260px;
+        height: 100vh;
+        position: fixed;
+        left: 0; top: 0;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .logo { color: var(--leaf-green); font-size: 1.5rem; font-weight: 700; }
+
+    .sidebar-nav ul { list-style: none; padding: 10px 0; }
+    
+    .sidebar-nav li a {
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        border-left: 4px solid transparent;
+    }
+
+    .sidebar-nav li a:hover, .sidebar-nav li.active a {
+        background: rgba(255,255,255,0.05);
+        color: var(--leaf-green);
+        border-left-color: var(--leaf-green);
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 992px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar.open { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        .mobile-close { cursor: pointer; font-size: 1.2rem; }
+    }
+
+    /* Desktop View */
+    @media (min-width: 993px) {
+        .mobile-close { display: none; }
+        .sidebar.closed { transform: translateX(-100%); }
+    }
+
+    .sidebar-footer { padding: 2rem; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); }
+</style>

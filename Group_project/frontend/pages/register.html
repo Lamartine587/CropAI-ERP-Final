@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body style="background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%); font-family: 'Poppins', sans-serif;">
 
@@ -17,50 +16,68 @@
                 <i class="fas fa-leaf"></i> CropAI
             </div>
             <ul class="nav-menu" style="display: flex; list-style: none; gap: 2rem;">
-                <li><a href="index.html" style="text-decoration: none; color: #34495e; font-weight: 500;">Back to Home</a></li>
+                <li><a href="../index.html" style="text-decoration: none; color: #34495e; font-weight: 500;">Back to Home</a></li>
             </ul>
         </div>
     </nav>
 
     <main class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 85vh; padding: 1rem;">
         
-        <div class="auth-card" style="background: white; padding: 3rem; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid rgba(46, 204, 113, 0.1);">
+        <div class="auth-card" style="background: white; padding: 2.5rem; border-radius: 20px; width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid rgba(46, 204, 113, 0.1);">
             
-            <div style="text-align: center; margin-bottom: 2.5rem;">
-                <div style="width: 70px; height: 70px; background: #e8f5e9; color: #2ecc71; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="width: 60px; height: 60px; background: #e8f5e9; color: #2ecc71; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem;">
                     <i class="fas fa-user-plus"></i>
                 </div>
-                <h2 style="color: #2c3e50; font-weight: 700; margin-bottom: 0.5rem;">Join the Community</h2>
-                <p style="color: #7f8c8d; font-size: 0.9rem;">Start monitoring your crops with AI today.</p>
+                <h2 style="color: #2c3e50; font-weight: 700; margin-bottom: 0.5rem;">Join CropAI</h2>
+                <p style="color: #7f8c8d; font-size: 0.9rem;">Register to save your AI diagnostics.</p>
             </div>
 
             <form id="register-form">
-                <div style="margin-bottom: 1.5rem;">
-                    <label for="register-email" style="display: block; margin-bottom: 0.6rem; color: #34495e; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
+                <div style="margin-bottom: 1.2rem;">
+                    <label for="register-name" style="display: block; margin-bottom: 0.5rem; color: #34495e; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Full Name</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-user" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
+                        <input type="text" id="register-name" required placeholder="Full Name" 
+                            style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border: 2px solid #edf2f7; border-radius: 12px; outline: none; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.2rem;">
+                    <label for="register-email" style="display: block; margin-bottom: 0.5rem; color: #34495e; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Email Address</label>
                     <div style="position: relative;">
                         <i class="fas fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
                         <input type="email" id="register-email" required placeholder="farmer@example.com" 
-                            style="width: 100%; padding: 0.9rem 1rem 0.9rem 2.8rem; border: 2px solid #edf2f7; border-radius: 12px; font-family: inherit; transition: all 0.3s ease; outline: none; box-sizing: border-box;">
+                            style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border: 2px solid #edf2f7; border-radius: 12px; outline: none; box-sizing: border-box;">
                     </div>
                 </div>
                 
-                <div style="margin-bottom: 2rem;">
-                    <label for="register-password" style="display: block; margin-bottom: 0.6rem; color: #34495e; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Create Password</label>
+                <div style="margin-bottom: 1.2rem;">
+                    <label for="register-password" style="display: block; margin-bottom: 0.5rem; color: #34495e; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Password</label>
                     <div style="position: relative;">
-                        <i class="fas fa-key" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
-                        <input type="password" id="register-password" required placeholder="Choose a strong password" 
-                            style="width: 100%; padding: 0.9rem 1rem 0.9rem 2.8rem; border: 2px solid #edf2f7; border-radius: 12px; font-family: inherit; transition: all 0.3s ease; outline: none; box-sizing: border-box;">
+                        <i class="fas fa-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
+                        <input type="password" id="register-password" required placeholder="Min. 6 characters" 
+                            style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border: 2px solid #edf2f7; border-radius: 12px; outline: none; box-sizing: border-box;">
                     </div>
                 </div>
 
-                <button type="submit" id="register-btn" style="width: 100%; padding: 1.1rem; background: #2ecc71; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(46, 204, 113, 0.2);">
-                    Create My Account <i class="fas fa-check-circle" style="margin-left: 8px;"></i>
+                <div style="margin-bottom: 1.8rem;">
+                    <label for="confirm-password" style="display: block; margin-bottom: 0.5rem; color: #34495e; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Confirm Password</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-shield-alt" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
+                        <input type="password" id="confirm-password" required placeholder="Repeat password" 
+                            style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border: 2px solid #edf2f7; border-radius: 12px; outline: none; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <button type="submit" id="register-btn" style="width: 100%; padding: 1rem; background: #2ecc71; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s ease;">
+                    Create Account
                 </button>
             </form>
 
-            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px dashed #e2e8f0;">
-                <p style="color: #7f8c8d; font-size: 0.9rem;">
-                    Already a member? <a href="login.html" style="color: #3498db; text-decoration: none; font-weight: 700;">Log in here</a>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <p style="color: #7f8c8d; font-size: 0.85rem;">
+                    Already a member? <a href="login.html" style="color: #2ecc71; text-decoration: none; font-weight: 700;">Log in</a>
                 </p>
             </div>
         </div>

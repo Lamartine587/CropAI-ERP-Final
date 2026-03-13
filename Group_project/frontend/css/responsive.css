@@ -43,7 +43,7 @@
     }
 }
 
-/* Small devices (768px to 991px) */
+/* Small devices / Tablets (768px to 991px) */
 @media (max-width: 991px) {
     .container,
     .nav-container,
@@ -64,6 +64,7 @@
         justify-content: center;
     }
     
+    /* Top Navbar Mobile Menu */
     .nav-menu {
         position: fixed;
         top: 70px;
@@ -74,7 +75,7 @@
         flex-direction: column;
         align-items: center;
         padding: 2rem;
-        transition: 0.3s ease;
+        transition: left 0.3s ease;
         z-index: 999;
     }
     
@@ -103,29 +104,54 @@
         content: '\f00d';
     }
     
-    /* Dashboard responsive */
+    /* =========================================
+       TRUE MOBILE SIDEBAR (Drawer Style)
+    ========================================= */
     .sidebar {
-        transform: translateX(-100%);
-        z-index: 1000;
+        position: fixed;
+        top: 0;
+        left: -100%; /* Hidden off-screen */
+        width: 300px;
+        max-width: 85%; /* Ensures a small gap on phones to tap out */
+        height: 100vh;
+        z-index: 9999; /* Highest priority */
+        transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 5px 0 25px rgba(0,0,0,0.3);
     }
     
     .sidebar.active {
-        transform: translateX(0);
+        left: 0; /* Slides in */
     }
     
     .main-content {
         margin-left: 0;
+        width: 100%;
     }
     
     .menu-toggle {
         display: block;
     }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+
+    /* Sidebar Background Overlay */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 9998; /* Just below the sidebar */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
     }
     
-    .sensor-grid {
+    .stats-grid, .sensor-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -147,15 +173,7 @@
         gap: 1.5rem;
     }
     
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .sensor-grid {
+    .features-grid, .stats-grid, .sensor-grid {
         grid-template-columns: 1fr;
     }
     
@@ -261,53 +279,23 @@
     }
 }
 
-/* Print styles */
-@media print {
-    .navbar,
-    .sidebar,
-    .top-bar,
-    .footer,
-    .cta,
-    .btn-primary,
-    .btn-secondary,
-    .alert-action {
-        display: none !important;
-    }
-    
-    .main-content {
-        margin: 0;
-        padding: 0;
-    }
-    
-    .content {
-        padding: 1cm;
-    }
-    
-    .sensor-card,
-    .stat-card,
-    .result-card {
-        break-inside: avoid;
-        box-shadow: none;
-        border: 1px solid #ddd;
-    }
-}
 /* =========================================
-   MOBILE PHONE OPTIMIZATIONS (Under 480px)
-   Field-ready UI for bright sunlight & one-handed use
+   MOBILE PHONE FIELD OPTIMIZATIONS (Under 480px)
+   Big touch targets for one-handed use
 ========================================= */
 @media (max-width: 480px) {
-    /* 1. Maximize touch targets for thumbs */
+    /* Maximize touch targets for thumbs */
     .btn-primary, 
     .btn-secondary,
     button[type="submit"],
     input[type="email"],
     input[type="password"] {
-        min-height: 50px; /* Apple/Android recommended minimum touch size */
+        min-height: 50px;
         font-size: 1.1rem;
         border-radius: 10px;
     }
 
-    /* 2. Optimize the AI Upload Area for quick field scanning */
+    /* AI Upload Area */
     .upload-area {
         padding: 3rem 1rem;
         background: var(--background-white);
@@ -315,7 +303,7 @@
     }
 
     .upload-area i {
-        font-size: 4rem; /* Make the camera icon massive */
+        font-size: 4rem; 
         margin-bottom: 1.5rem;
     }
 
@@ -323,39 +311,24 @@
         font-size: 1.3rem;
     }
 
-    /* 3. High-contrast, easy-to-read sensor cards */
+    /* Sensor cards */
     .sensor-card {
         padding: 1.25rem;
-        border-left: 6px solid var(--primary-color); /* Add physical color anchor */
+        border-left: 6px solid var(--primary-color);
     }
 
     .sensor-value {
-        font-size: 2.2rem; /* Make numbers pop */
+        font-size: 2.2rem;
     }
 
-    /* 4. Full-screen mobile sidebar */
-    .sidebar.active {
-        width: 100%; /* Take up the whole screen when menu is opened */
-        max-width: 100%;
-    }
-
-    .sidebar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    /* Add a close button to the mobile menu header */
-    .sidebar-header::after {
-        content: '\f00d'; /* FontAwesome X icon */
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
+    /* Close Button on Sidebar */
+    .sidebar-header .close-sidebar {
+        display: block;
         font-size: 1.5rem;
-        color: var(--text-gray);
         cursor: pointer;
+        color: var(--text-gray);
     }
 
-    /* 5. Adjust typography for narrow screens */
     .hero-content h1 {
         font-size: 2.2rem;
         line-height: 1.2;
@@ -365,7 +338,6 @@
         font-size: 1.8rem;
     }
 
-    /* 6. Stack the Auth cards nicely */
     .auth-container {
         padding: 2rem 1rem;
     }
@@ -373,4 +345,14 @@
     .auth-card {
         padding: 1.5rem;
     }
+}
+
+/* Print styles */
+@media print {
+    .navbar, .sidebar, .top-bar, .footer, .cta, .btn-primary, .btn-secondary, .alert-action {
+        display: none !important;
+    }
+    .main-content { margin: 0; padding: 0; }
+    .content { padding: 1cm; }
+    .sensor-card, .stat-card, .result-card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
 }

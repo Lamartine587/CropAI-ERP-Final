@@ -1,79 +1,83 @@
-// frontend/js/auth.js
+/**
+ * Authentication & Security Controller
+ * Handles Login, Registration, Session Management, and Page Guarding.
+ */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Grab the forms and buttons from the DOM
     const registerForm = document.getElementById('register-form');
     const loginForm = document.getElementById('login-form');
-    const logoutBtn = document.getElementById('logout-btn');
 
-    // Base URL for your backend API
-    const API_URL = 'http://localhost:5000/api/auth';
-
-    // 2. Handle Registration
+    // 1. UPDATED REGISTRATION LOGIC
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            // Select all new fields
+            const fullName = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
             const submitBtn = registerForm.querySelector('button[type="submit"]');
             
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Creating Account...';
+            // Validation: Ensure passwords match
+            if (password !== confirmPassword) {
+                alert("Passwords do not match. Please try again.");
+                return;
+            }
+
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch(`${API_URL}/register`, {
+                const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ 
+                        fullName, // Sending Full Name to be saved in profile table
+                        email, 
+                        password 
+                    })
                 });
-
+                
                 const data = await response.json();
-
+                
                 if (response.ok) {
                     alert('Account created successfully! Please log in.');
                     window.location.href = 'login.html'; 
-                } else {
-                    throw new Error(data.error || 'Registration failed');
+                } else { 
+                    throw new Error(data.error || 'Registration failed'); 
                 }
-            } catch (error) {
-                alert(error.message);
-            } finally {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
+            } catch (error) { 
+                alert(error.message); 
+            } finally { 
+                submitBtn.textContent = 'Register'; 
+                submitBtn.disabled = false; 
             }
         });
     }
 
-    // 3. Handle Login
+    // 2. LOGIN LOGIC
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const submitBtn = loginForm.querySelector('button[type="submit"]');
             
-            submitBtn.textContent = 'Logging in...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch(`${API_URL}/login`, {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-
                 const data = await response.json();
-
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
-                    // Use replace so they can't click 'back' to the login screen
                     window.location.replace('dashboard.html');
-                } else {
-                    throw new Error(data.error || 'Login failed');
-                }
+                } else { throw new Error(data.error); }
             } catch (error) {
                 alert(error.message);
                 submitBtn.textContent = 'Login';
@@ -82,24 +86,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Handle Logout (SECURED)
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Clear token
-            localStorage.removeItem('token');
-            // 'replace' wipes the current session from the browser's back-button memory
-            window.location.replace('index.html');
-        });
-    }
-
-    // 5. Initial UI Check on Page Load
     updateAuthUI();
 });
 
+// 3. GLOBAL LOGOUT
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#logout-btn');
+    if (btn) {
+        e.preventDefault();
+        if (confirm("Sign out of CropAI?")) {
+            localStorage.removeItem('token');
+            window.location.replace('/index.html');
+        }
+    }
+});
+
 /**
- * Security & UI Helper
- * Toggles visibility of elements and prevents guests from viewing private pages.
+ * UI SYNC & SECURITY GUARD
  */
 function updateAuthUI() {
     const token = localStorage.getItem('token');
@@ -108,26 +111,18 @@ function updateAuthUI() {
     const currentPage = window.location.pathname;
 
     if (token) {
-        // --- USER IS LOGGED IN ---
         guestOnlyElements.forEach(el => el.style.display = 'none');
-        
         authOnlyElements.forEach(el => {
-            if (el.tagName === 'LI') {
-                el.style.display = 'block';
-            } else {
-                el.style.display = 'flex'; 
-            }
+            el.style.display = (el.tagName === 'LI') ? 'block' : 'flex';
         });
     } else {
-        // --- USER IS A GUEST ---
         guestOnlyElements.forEach(el => el.style.display = 'block');
         authOnlyElements.forEach(el => el.style.display = 'none');
 
-        // SECURITY REDIRECT: Kick guests out of private pages
-        const restrictedPages = ['dashboard.html', 'hardware.html'];
-        const isOnRestrictedPage = restrictedPages.some(page => currentPage.includes(page));
-
-        if (isOnRestrictedPage) {
+        const restrictedPages = ['dashboard.html', 'hardware.html', 'history.html'];
+        const isRestricted = restrictedPages.some(page => currentPage.includes(page));
+        
+        if (isRestricted) {
             window.location.replace('login.html');
         }
     }

@@ -1,4 +1,6 @@
-// frontend/js/public-scanner.js
+// 1. Define the base URL at the top to fix the "not defined" error
+// Using a relative path '/' makes it work on localhost AND ngrok automatically
+const API_BASE_URL = '/api';
 
 const fileInput = document.getElementById('publicFile');
 const uploadArea = document.getElementById('publicUploadArea');
@@ -23,17 +25,26 @@ fileInput.addEventListener('change', function() {
 
 // Handle AI Analysis
 analyzeBtn.addEventListener('click', async () => {
+    if (!fileInput.files[0]) return alert("Please select an image first!");
+
     const formData = new FormData();
     formData.append('image', fileInput.files[0]);
 
-    // UI state
+    // UI state: show loading, hide preview
     preview.style.display = 'none';
     spinner.style.display = 'block';
+    resultDiv.style.display = 'none';
 
     try {
-        const response = await fetch('http://localhost:5000/api/ai/public-detect', {
+        // 2. Use the defined API_BASE_URL variable
+        // This removes the hardcoded localhost:5000 that causes tunnel errors
+        const response = await fetch(`${API_BASE_URL}/ai/public-detect`, {
             method: 'POST',
-            body: formData // No headers/token needed for public scan
+            body: formData,
+            // This header helps bypass the ngrok warning page for automated calls
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
         });
 
         const result = await response.json();
@@ -42,16 +53,24 @@ analyzeBtn.addEventListener('click', async () => {
             spinner.style.display = 'none';
             resultDiv.style.display = 'block';
             
-            // Populate results
+            // Populate results from the standard AI Controller response
             document.getElementById('diseaseHeader').textContent = result.data.disease;
             document.getElementById('cropType').textContent = result.data.crop;
             document.getElementById('cropStatus').textContent = result.data.status;
-            document.getElementById('cropTreatment').textContent = result.data.treatments.join(', ');
+            
+            // Join the treatments array into a readable string
+            const treatmentList = result.data.treatments;
+            document.getElementById('cropTreatment').textContent = Array.isArray(treatmentList) 
+                ? treatmentList.join(', ') 
+                : treatmentList;
+
         } else {
-            throw new Error(result.error);
+            throw new Error(result.error || "AI failed to analyze image");
         }
     } catch (err) {
+        spinner.style.display = 'none';
+        preview.style.display = 'block';
         alert("Error: " + err.message);
-        location.reload();
+        console.error("Scanner Error:", err);
     }
 });

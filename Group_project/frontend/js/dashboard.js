@@ -1,232 +1,140 @@
-// Dashboard JavaScript (Connected to Backend API)
+/**
+ * Dashboard Controller
+ * Manages sensor polling, AI image analysis, and user personalization.
+ */
 
-// API Base URL (Update if hosting online)
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = '/api'; 
 
-// DOM Elements
-let sidebar = document.querySelector('.sidebar');
-let menuToggle = document.querySelector('.menu-toggle');
-let themeToggle = document.querySelector('.theme-toggle');
-let uploadArea = document.getElementById('uploadArea');
-let previewContainer = document.getElementById('previewContainer');
-let imagePreview = document.getElementById('imagePreview');
-let analysisResult = document.getElementById('analysisResult');
-let analysisModal = document.getElementById('analysisModal');
-let imageInput = document.getElementById('imageInput');
+// DOM Selectors
+const uploadArea = document.getElementById('uploadArea');
+const previewContainer = document.getElementById('previewContainer');
+const imagePreview = document.getElementById('imagePreview');
+const imageInput = document.getElementById('imageInput');
+const analysisModal = document.getElementById('analysisModal');
+const analysisResult = document.getElementById('analysisResult');
+const loadingSpinner = document.getElementById('loading-spinner');
 
-// Initialize Dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    initializeDashboard();
-    startRealSensorPolling(); // Changed to fetch real data
-    loadAlerts();
-});
-
-// --- UI Logic (Kept Intact) ---
-
-function initializeDashboard() {
-    if (menuToggle) menuToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
-    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+document.addEventListener('DOMContentLoaded', () => {
+    startSensorPolling();
+    fetchUserProfile(); // Automatically fetch and display the user's name
     
-    // Setup file input listener for the AI scanner
+    // Preview image on selection
     if(imageInput) {
-        imageInput.addEventListener('change', function(e) {
-            previewImage(this);
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    uploadArea.style.display = 'none';
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
         });
     }
-}
+});
 
-function toggleTheme() {
-    document.body.classList.toggle('dark-theme');
-    let icon = themeToggle.querySelector('i');
-    if (document.body.classList.contains('dark-theme')) {
-        icon.classList.replace('fa-moon', 'fa-sun');
-        localStorage.setItem('theme', 'dark');
-    } else {
-        icon.classList.replace('fa-sun', 'fa-moon');
-        localStorage.setItem('theme', 'light');
-    }
-}
-
-// Load saved theme
-if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark-theme');
-    if (themeToggle) themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-}
-
-function openUploadModal() {
-    if(imageInput) imageInput.click();
-}
-
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            imagePreview.src = e.target.result;
-            uploadArea.style.display = 'none';
-            previewContainer.style.display = 'block';
-        }
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-function resetUpload() {
-    if(imageInput) imageInput.value = '';
-    previewContainer.style.display = 'none';
-    uploadArea.style.display = 'block';
-    analysisResult.style.display = 'none';
-}
-
-function closeModal() {
-    analysisModal.classList.remove('active');
-}
-
-
-// --- 1. REAL AI INTEGRATION (GEMINI API) ---
-
-async function analyzeImage() {
-    if (!imageInput.files[0]) {
-        alert("Please select an image first.");
-        return;
-    }
-
-    // Show loading modal
-    analysisModal.classList.add('active');
-    
-    // Create form data to send file
-    const formData = new FormData();
-    formData.append('image', imageInput.files[0]);
-
-    // Get Auth Token if logged in
+// --- PERSONALIZATION LOGIC ---
+async function fetchUserProfile() {
     const token = localStorage.getItem('token');
-    const headers = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (!token) return; // Leave as "Farm Overview" if guest
 
     try {
-        // Send to our Node.js Backend
+        const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // Capitalize first name and update the DOM
+            const firstName = data.fullName.split(' ')[0];
+            const welcomeTitle = document.getElementById('welcome-title');
+            if (welcomeTitle) {
+                welcomeTitle.textContent = `Welcome, ${firstName}!`;
+            }
+        }
+    } catch (err) {
+        console.warn("Failed to load user profile for personalization.");
+    }
+}
+
+// --- AI SCANNER LOGIC ---
+async function analyzeImage() {
+    const file = imageInput.files[0];
+    if (!file) return;
+
+    // Show the modal as a flexbox to center it
+    analysisModal.style.display = 'flex';
+    loadingSpinner.style.display = 'block';
+    analysisResult.style.display = 'none';
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    try {
         const response = await fetch(`${API_BASE_URL}/ai/detect`, {
             method: 'POST',
-            headers: headers,
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'ngrok-skip-browser-warning': 'true' 
+            },
             body: formData
         });
 
         const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Analysis failed');
 
-        if (!response.ok) throw new Error(result.error || 'Failed to analyze image');
-
-        // Hide modal and show results
-        analysisModal.classList.remove('active');
-        showAnalysisResult(result.data);
+        // Hide spinner and show results
+        loadingSpinner.style.display = 'none';
+        displayResults(result.data);
 
     } catch (error) {
         console.error("AI Error:", error);
-        analysisModal.classList.remove('active');
-        alert("Error connecting to AI: " + error.message);
+        alert("Diagnostic Error: " + error.message);
+        closeModal();
     }
 }
 
-function showAnalysisResult(aiData) {
+function displayResults(data) {
     analysisResult.style.display = 'block';
+    document.getElementById('diseaseName').textContent = data.disease;
+    document.getElementById('symptoms').textContent = `Detected in ${data.crop}. Status: ${data.status}`;
     
-    // Map Gemini JSON data to your beautiful UI
-    document.getElementById('diseaseName').textContent = aiData.disease === "None" ? "Healthy Plant" : aiData.disease;
-    document.getElementById('confidence').textContent = "AI Analysis Complete"; // Gemini doesn't always return standard confidence
-    document.getElementById('symptoms').textContent = `Detected Crop: ${aiData.crop}`;
-    
-    // Format treatments array into a string
-    const treatmentsHtml = aiData.treatments ? aiData.treatments.map(t => `• ${t}`).join('<br>') : "No treatment needed.";
-    document.getElementById('treatment').innerHTML = treatmentsHtml;
-    
-    // Determine severity based on status
-    let severityClass = aiData.status === 'Healthy' ? 'low' : 'high';
-    let severityElement = document.querySelector('.severity');
-    
-    if(severityElement) {
-        severityElement.className = `severity ${severityClass}`;
-        severityElement.textContent = aiData.status;
-    }
+    const badge = document.getElementById('severityBadge');
+    badge.textContent = data.status;
+    badge.className = `severity ${data.status.toLowerCase()}`;
+
+    const treatments = data.treatments 
+        ? data.treatments.map(t => `<li style="margin-bottom:8px;"><i class="fas fa-check-circle" style="color:#2ecc71;"></i> ${t}</li>`).join('')
+        : "No treatment needed.";
+        
+    document.getElementById('treatment').innerHTML = `<ul style="list-style:none; padding:0; font-size:0.9rem;">${treatments}</ul>`;
 }
 
+function resetUpload() {
+    imageInput.value = '';
+    previewContainer.style.display = 'none';
+    uploadArea.style.display = 'block';
+}
 
-// --- 2. REAL IoT SENSOR INTEGRATION ---
+function closeModal() {
+    analysisModal.style.display = 'none';
+    resetUpload();
+}
 
-// Fetch data from Node.js backend instead of Math.random()
-async function fetchLiveSensorData() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/iot/sensors/latest`);
-        if(!response.ok) return;
-
-        const data = await response.json();
-
-        if (data.temperature) {
-            updateSensorValue('temperatureValue', `${data.temperature}°C`);
-            updateProgressBar('temperatureValue', ((data.temperature - 15) / 25) * 100);
-            
-            updateSensorValue('humidityValue', `${data.humidity}%`);
-            updateProgressBar('humidityValue', data.humidity);
-            
-            updateSensorValue('moistureValue', `${data.soilMoisture}%`);
-            updateProgressBar('moistureValue', data.soilMoisture);
-
-            // Dynamic logic for UI alerts
-            if(data.soilMoisture < 30) {
-                 document.getElementById('moistureValue').style.color = 'var(--danger-color)';
-            } else {
-                 document.getElementById('moistureValue').style.color = ''; // reset
+// --- IOT SENSOR POLLING ---
+function startSensorPolling() {
+    const fetchSensors = async () => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/iot/sensors/latest`);
+            const data = await res.json();
+            if (data.temperature) {
+                document.getElementById('temperatureValue').textContent = `${data.temperature}°C`;
+                document.getElementById('moistureValue').textContent = `${data.soilMoisture}%`;
+                document.getElementById('humidityValue').textContent = `${data.humidity}%`;
             }
-        }
-    } catch (error) {
-        console.error("Failed to fetch live sensor data", error);
-    }
-}
-
-function startRealSensorPolling() {
-    // Fetch immediately, then every 5 seconds
-    fetchLiveSensorData();
-    setInterval(fetchLiveSensorData, 5000);
-}
-
-function updateSensorValue(elementId, value) {
-    let element = document.getElementById(elementId);
-    if (element) element.textContent = value;
-}
-
-function updateProgressBar(elementId, percentage) {
-    // Ensure percentage is between 0 and 100
-    const safePercent = Math.max(0, Math.min(100, percentage));
-    
-    // Traverse DOM to find the specific progress bar for this sensor
-    const sensorContainer = document.getElementById(elementId)?.closest('.sensor-card');
-    if (sensorContainer) {
-        const bar = sensorContainer.querySelector('.progress');
-        if (bar) bar.style.width = `${safePercent}%`;
-    }
-}
-
-// --- Minor Utilities ---
-function loadAlerts() {
-    // Keeping your static mock alerts for the UI demo purposes
-    let mockAlerts = [
-        { title: 'AI System Online', message: 'Gemini Vision Model connected and ready.', time: 'Just now', severity: 'low', icon: 'check-circle' },
-        { title: 'Live Sensors Active', message: 'Receiving data from IoT devices.', time: '2 mins ago', severity: 'low', icon: 'wifi' }
-    ];
-    displayAlerts(mockAlerts);
-}
-
-function displayAlerts(alerts) {
-    let alertsList = document.getElementById('alertsList');
-    if (!alertsList) return;
-    alertsList.innerHTML = '';
-    alerts.forEach(alert => {
-        let alertElement = document.createElement('div');
-        alertElement.className = `alert-item ${alert.severity}`;
-        alertElement.innerHTML = `
-            <div class="alert-icon"><i class="fas fa-${alert.icon}"></i></div>
-            <div class="alert-content">
-                <h4>${alert.title}</h4>
-                <p>${alert.message}</p>
-                <span class="alert-time"><i class="fas fa-clock"></i> ${alert.time}</span>
-            </div>
-        `;
-        alertsList.appendChild(alertElement);
-    });
+        } catch (e) { console.warn("Sensor sync idle..."); }
+    };
+    fetchSensors();
+    setInterval(fetchSensors, 5000);
 }
