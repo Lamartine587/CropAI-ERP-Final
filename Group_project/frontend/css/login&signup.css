@@ -1,0 +1,125 @@
+/* Resetting default margins and setting a font */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url("../img/Agriculture.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.container {
+  background: rgba(23, 139, 23, 0.781); 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.heading1 {
+  margin-bottom: 10px;
+  color: #000000;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+p {
+  color: #000000;
+  margin-bottom: 25px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Form Layout */
+.f1 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Aligns checkbox/label to the left */
+}
+
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  border-color: #007bff;
+}
+
+/* Remember Me section */
+.f1 label {
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+#Remember {
+  margin-bottom: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  
+}
+.rem{
+    color: black;
+    font-weight: bold;
+}
+
+/* Button Styling */
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.btn-login:hover {
+  background-color: #0056b3;
+}
+
+.btn-login::after {
+  content: "Login"; 
+}
+
+/* Signup Link */
+.f1 p {
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
