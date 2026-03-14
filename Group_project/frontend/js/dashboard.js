@@ -180,9 +180,13 @@ function closeModal() {
 // --- 3. IOT SENSOR POLLING & PREDICTIVE ALERTS (Proactive) ---
 function startSensorPolling() {
     const fetchSensors = async () => {
+        const token = localStorage.getItem('token');
         try {
             const res = await fetch(`${API_BASE_URL}/iot/sensors/latest`, {
-                headers: { 'ngrok-skip-browser-warning': 'true' }
+                headers: { 
+                    'ngrok-skip-browser-warning': 'true',
+                    'Authorization': token ? `Bearer ${token}` : '' 
+                }
             });
             const data = await res.json();
             
@@ -196,21 +200,36 @@ function startSensorPolling() {
                 if (mVal) mVal.textContent = `${data.soilMoisture}%`;
                 if (hVal) hVal.textContent = `${data.humidity}%`;
 
-                // --- AI PREDICTION LOGIC ---
-                if (alertsList && data.prediction && data.prediction.riskLevel === 'High') {
-                    alertsList.innerHTML = `
-                        <div class="alert-box predictive" style="background: #fff5f5; color: #c53030; padding: 20px; border-radius: 12px; border-left: 6px solid #f56565; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-biohazard"></i> REGIONAL AI THREAT
-                            </h4>
-                            <p style="margin: 5px 0; font-size: 0.95rem;">
-                                <strong>Predicted:</strong> ${data.prediction.predictedDisease} in ${data.prediction.likelyAffectedCrop}
-                            </p>
-                            <div style="margin-top: 15px; font-size: 0.85rem; background: white; padding: 12px; border-radius: 8px; border: 1px solid #fed7d7;">
-                                <strong style="color: #e53e3e;">Action Required:</strong><br>
-                                ${data.prediction.expertRecommendation}
-                            </div>
-                        </div>`;
+                // --- AI PREDICTION UI LOGIC ---
+                if (alertsList) {
+                    if (data.prediction && data.prediction.riskLevel === 'High') {
+                        // 🔴 HIGH RISK AI ALERT
+                        alertsList.innerHTML = `
+                            <div class="alert-box predictive" style="background: #fff5f5; color: #c53030; padding: 20px; border-radius: 12px; border-left: 6px solid #f56565; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                                <h4 style="margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-biohazard"></i> REGIONAL AI THREAT
+                                </h4>
+                                <p style="margin: 5px 0; font-size: 0.95rem;">
+                                    <strong>Predicted:</strong> ${data.prediction.predictedDisease} in ${data.prediction.likelyAffectedCrop}
+                                </p>
+                                <div style="margin-top: 15px; font-size: 0.85rem; background: white; padding: 12px; border-radius: 8px; border: 1px solid #fed7d7;">
+                                    <strong style="color: #e53e3e;">Expert Action Required:</strong><br>
+                                    ${data.prediction.expertRecommendation}
+                                </div>
+                            </div>`;
+                    } else if (data.soilMoisture < 30) {
+                        // 🟠 BASIC SENSOR ALERT (Drought)
+                        alertsList.innerHTML = `
+                            <div class="alert-box critical" style="background: #fffbeb; color: #b45309; padding: 15px; border-radius: 8px; border-left: 5px solid #f59e0b; margin-bottom: 10px;">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> Soil moisture critically low (${data.soilMoisture}%).
+                            </div>`;
+                    } else {
+                        // 🟢 ALL CLEAR
+                        alertsList.innerHTML = `
+                            <div class="alert-box optimal" style="background: #dcfce7; color: #166534; padding: 15px; border-radius: 8px; border-left: 5px solid #22c55e; margin-bottom: 10px;">
+                                <i class="fas fa-check-circle"></i> Farm conditions are optimal. No AI threats detected.
+                            </div>`;
+                    }
                 }
             }
         } catch (e) { 
@@ -219,5 +238,5 @@ function startSensorPolling() {
     };
     
     fetchSensors();
-    setInterval(fetchSensors, 8000); // Polling backed off to 8 seconds to save Render resources
+    setInterval(fetchSensors, 8000); 
 }
