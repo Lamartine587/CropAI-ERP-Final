@@ -102,6 +102,9 @@ npm start
 
 * **Lamartine Kipkoech (Don)** - Full Stack Developer & AI Architect
 * **Mary safari** - backend
+* **Bildad Ochieng** -Frontend 
+* ** Brian Jean** -Frontend 
+* **Hildah Kinya** -Designer
 
 ```
 
