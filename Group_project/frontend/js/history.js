@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', fetchHistory);
+  document.addEventListener('DOMContentLoaded', fetchHistory);
 
 async function fetchHistory() {
     // 1. FIXED: Pointing to the correct ID in your new HTML
