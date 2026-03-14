@@ -1,9 +1,10 @@
 /**
  * Dashboard Controller - CropAI ERP
- * Optimized for PostgreSQL (Snake Case), IoT Prediction, and Featherless AI.
+ * Optimized for PostgreSQL, IoT Prediction, and Featherless AI.
  */
 
-const API_BASE_URL = '/api'; 
+// 1. DYNAMIC API TARGETING
+const API_BASE_URL = window.location.origin + '/api'; 
 
 // DOM Selectors
 const uploadArea = document.getElementById('uploadArea');
@@ -85,7 +86,7 @@ async function analyzeImage() {
     const token = localStorage.getItem('token');
     const endpoint = token ? `${API_BASE_URL}/ai/detect` : `${API_BASE_URL}/ai/public-detect`;
     
-    const headers = { 'ngrok-skip-browser-warning': 'true' };
+    const headers = { 'ngrok-skip-browser-warning': '69420' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     try {
@@ -108,30 +109,61 @@ async function analyzeImage() {
     }
 }
 
+// --- NEW: DETAILED RESULTS MAPPING ---
 function displayResults(data) {
     if (!analysisResult) return;
-    analysisResult.style.display = 'block';
     
+    // JSON Guard: Just in case the AI wraps the response
+    let aiData = data;
+    if (typeof aiData === 'string') {
+        const match = aiData.match(/\{[\s\S]*\}/);
+        aiData = match ? JSON.parse(match[0]) : {};
+    }
+
+    // Modal DOM Elements
+    const statusBadge = document.getElementById('statusBadge');
     const diseaseName = document.getElementById('diseaseName');
-    const symptoms = document.getElementById('symptoms');
-    const severityBadge = document.getElementById('severityBadge');
-    const treatmentList = document.getElementById('treatment');
+    const cropTypeIdentified = document.getElementById('cropTypeIdentified');
+    const symptomsEl = document.getElementById('symptoms');
+    const treatmentEl = document.getElementById('treatment');
+    const preventionEl = document.getElementById('prevention');
 
-    if (diseaseName) diseaseName.textContent = data.disease;
-    if (symptoms) symptoms.textContent = `Crop: ${data.crop} | Confidence: ${data.confidence}%`;
-    
-    if (severityBadge) {
-        severityBadge.textContent = data.status;
-        severityBadge.className = `severity ${data.status.toLowerCase()}`;
-    }
-
-    const treatmentsHtml = data.treatments && data.treatments.length > 0
-        ? data.treatments.map(t => `<li style="margin-bottom:8px;"><i class="fas fa-check-circle" style="color:#2ecc71; margin-right:8px;"></i>${t}</li>`).join('')
-        : "<li>No specific treatment required.</li>";
+    // 1. Status Badge (Dynamic Color)
+    if (statusBadge) {
+        const statusText = aiData.status || "EVALUATED";
+        statusBadge.textContent = statusText.toUpperCase() + " VERIFIED";
         
-    if (treatmentList) {
-        treatmentList.innerHTML = `<ul style="list-style:none; padding:0; font-size:0.95rem; color:#4a5568;">${treatmentsHtml}</ul>`;
+        // Turn red if infected, green if healthy
+        if (statusText.toLowerCase() === 'infected') {
+            statusBadge.style.color = '#e74c3c';
+            statusBadge.style.backgroundColor = 'rgba(231, 76, 60, 0.15)';
+        } else {
+            statusBadge.style.color = '#2ecc71';
+            statusBadge.style.backgroundColor = 'rgba(46, 204, 113, 0.15)';
+        }
     }
+
+    // 2. High-Level Info
+    if (diseaseName) diseaseName.textContent = aiData.disease || "No Pathogen Found";
+    if (cropTypeIdentified) cropTypeIdentified.textContent = "Detected in " + (aiData.crop || "Unknown Crop");
+    
+    // 3. Detailed AI Insights
+    if (symptomsEl) symptomsEl.textContent = aiData.symptoms || "No visible symptoms mapped.";
+    if (preventionEl) preventionEl.textContent = aiData.prevention || "Maintain standard field hygiene and watering schedules.";
+
+    // 4. Treatment List Formatting
+    if (treatmentEl) {
+        if (Array.isArray(aiData.treatments)) {
+            treatmentEl.innerHTML = `<ul style="margin: 0; padding-left: 20px;">
+                ${aiData.treatments.map(t => `<li style="margin-bottom: 5px;">${t}</li>`).join('')}
+            </ul>`;
+        } else {
+            treatmentEl.textContent = aiData.treatments || "No immediate chemical intervention required.";
+        }
+    }
+
+    // Reveal the populated modal
+    analysisResult.style.display = 'block';
 }
 
 function resetUpload() {
@@ -165,37 +197,20 @@ function startSensorPolling() {
                 if (hVal) hVal.textContent = `${data.humidity}%`;
 
                 // --- AI PREDICTION LOGIC ---
-                if (alertsList) {
-                    if (data.prediction && data.prediction.riskLevel === 'High') {
-                        // Display AI Threat Prediction
-                        alertsList.innerHTML = `
-                            <div class="alert-box predictive" style="background: #fff5f5; color: #c53030; padding: 15px; border-radius: 12px; border-left: 6px solid #f56565; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                                <h4 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;">
-                                    <i class="fas fa-biohazard"></i> AI REGIONAL THREAT ALERT
-                                </h4>
-                                <p style="margin: 5px 0; font-size: 0.9rem;">
-                                    <strong>Predicted Threat:</strong> ${data.prediction.predictedDisease} in <strong>${data.prediction.likelyAffectedCrop}</strong>
-                                </p>
-                                <div style="margin-top: 10px; font-size: 0.85rem; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 6px;">
-                                    <strong>Recommendation:</strong> ${data.prediction.expertRecommendation}
-                                </div>
-                                <small style="display: block; margin-top: 8px; opacity: 0.8; font-style: italic;">
-                                    *Alert broadcasted to all farmers in this region.
-                                </small>
-                            </div>`;
-                    } else if (data.soilMoisture < 30) {
-                        // Fallback to basic sensor alert if no AI prediction
-                        alertsList.innerHTML = `
-                            <div class="alert-box critical" style="background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; border-left: 5px solid #ef4444; margin-bottom: 10px; font-weight: 500;">
-                                <i class="fas fa-exclamation-triangle"></i> <strong>CRITICAL:</strong> Moisture low (${data.soilMoisture}%).
-                            </div>`;
-                    } else {
-                        // Optimal Status
-                        alertsList.innerHTML = `
-                            <div class="alert-box optimal" style="background: #dcfce7; color: #166534; padding: 15px; border-radius: 8px; border-left: 5px solid #22c55e; margin-bottom: 10px; font-weight: 500;">
-                                <i class="fas fa-check-circle"></i> Farm conditions are currently optimal. No threats predicted.
-                            </div>`;
-                    }
+                if (alertsList && data.prediction && data.prediction.riskLevel === 'High') {
+                    alertsList.innerHTML = `
+                        <div class="alert-box predictive" style="background: #fff5f5; color: #c53030; padding: 20px; border-radius: 12px; border-left: 6px solid #f56565; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-biohazard"></i> REGIONAL AI THREAT
+                            </h4>
+                            <p style="margin: 5px 0; font-size: 0.95rem;">
+                                <strong>Predicted:</strong> ${data.prediction.predictedDisease} in ${data.prediction.likelyAffectedCrop}
+                            </p>
+                            <div style="margin-top: 15px; font-size: 0.85rem; background: white; padding: 12px; border-radius: 8px; border: 1px solid #fed7d7;">
+                                <strong style="color: #e53e3e;">Action Required:</strong><br>
+                                ${data.prediction.expertRecommendation}
+                            </div>
+                        </div>`;
                 }
             }
         } catch (e) { 
@@ -204,5 +219,5 @@ function startSensorPolling() {
     };
     
     fetchSensors();
-    setInterval(fetchSensors, 5000); // Poll every 5 seconds
+    setInterval(fetchSensors, 8000); // Polling backed off to 8 seconds to save Render resources
 }
