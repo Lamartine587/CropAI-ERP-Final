@@ -10,7 +10,6 @@ const analyzeCropImage = async (filePath, mimeType, userId = null) => {
         const imageBuffer = fs.readFileSync(filePath);
         const base64Image = imageBuffer.toString('base64');
 
-        // 🔥 ENHANCED PROMPT: Forcing detailed prevention strategies
         const prompt = `Act as an expert Agricultural Pathologist. Analyze this crop image.
         Return ONLY a raw JSON object: 
         {
@@ -100,11 +99,25 @@ const generatePersonalizedInsight = async (userCrops, sensorData, imageResult) =
 
 /**
  * 3. ENVIRONMENTAL RISK PREDICTION
+ * Model: DeepSeek V3.2
+ * Function: Predicts threats based on real-time weather and the user's registered crops.
  */
 const generateEnvironmentalRisk = async (crops, sensors) => {
     try {
-        const prompt = `Sensors: Temp ${sensors.temperature}°C, Humid ${sensors.humidity}%. Analyze risk for: ${crops}.
-        Return JSON ONLY: {"riskLevel": "Low|Medium|High", "predictedDisease": "string", "expertRecommendation": "string"}`;
+        // 🔥 ENHANCED PROMPT: Forces AI to identify the exact crop at risk and provide a prevention plan
+        const prompt = `You are an expert AI Agronomist.
+        Current Weather: Temperature ${sensors.temperature}°C, Humidity ${sensors.humidity}%, Soil Moisture ${sensors.soilMoisture}%.
+        Farmer's Registered Crops: ${crops}.
+        
+        Task: Predict the most likely disease or pest threat based on these conditions. Note that high humidity favors fungal/blight outbreaks, while high heat and low moisture favor drought stress or pests.
+        
+        Return EXACTLY this JSON structure ONLY:
+        {
+            "riskLevel": "Low|Medium|High",
+            "predictedDisease": "Name of the specific disease or pest",
+            "likelyAffectedCrop": "Which specific crop from the farmer's list is most vulnerable",
+            "expertRecommendation": "Detailed prevention steps (e.g., specific organic/chemical applications, watering adjustments)"
+        }`;
 
         const response = await fetch('https://api.featherless.ai/v1/chat/completions', {
             method: 'POST',
@@ -120,9 +133,12 @@ const generateEnvironmentalRisk = async (crops, sensors) => {
         });
 
         const data = await response.json();
+        
+        // Robust JSON cleaning
         let clean = data.choices[0].message.content.trim().replace(/```json/gi, '').replace(/```/g, '');
         return JSON.parse(clean);
     } catch (err) {
+        console.error("Prediction Engine Error:", err);
         return null;
     }
 };
