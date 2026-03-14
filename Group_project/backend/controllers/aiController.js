@@ -10,10 +10,24 @@ const analyzeCropImage = async (filePath, mimeType, userId = null) => {
         const imageBuffer = fs.readFileSync(filePath);
         const base64Image = imageBuffer.toString('base64');
 
-        const prompt = `Act as an expert Agricultural Pathologist. Analyze this crop image.
-        Return ONLY a raw JSON object: 
+        // 🔥 ENHANCED PROMPT: Added "Not a crop" fallback logic
+        const prompt = `Act as an expert Agricultural Pathologist. 
+        First, verify if the image actually contains a plant, leaf, or crop.
+        
+        IF IT IS NOT A PLANT (e.g., a person, car, animal, random object), return EXACTLY this JSON ONLY:
         {
-            "crop": "string",
+            "crop": "Invalid Image",
+            "disease": "None",
+            "status": "Not a Crop",
+            "confidence": 100,
+            "symptoms": "The uploaded image does not appear to contain any agricultural plants or leaves.",
+            "treatments": ["Please upload a clear, focused photo of a crop or leaf."],
+            "prevention": "Ensure the camera is focused directly on the affected plant tissue."
+        }
+
+        IF IT IS A PLANT, analyze it and return ONLY a raw JSON object: 
+        {
+            "crop": "string (name of crop)",
             "disease": "string",
             "status": "Healthy|Infected",
             "confidence": number,
@@ -51,14 +65,20 @@ const analyzeCropImage = async (filePath, mimeType, userId = null) => {
 
         const aiResponse = JSON.parse(cleanContent);
 
-        const detectionRecord = await Detection.create({
-            user_id: userId,
-            ...aiResponse,
-            analyzedAt: new Date()
-        });
+        // Only save to scan history if it was actually a valid scan
+        let detectionRecord = null;
+        if (aiResponse.status !== "Not a Crop") {
+            detectionRecord = await Detection.create({
+                user_id: userId,
+                ...aiResponse,
+                analyzedAt: new Date()
+            });
+        }
 
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        return detectionRecord;
+        
+        // Return the response to the frontend regardless (so the user sees the error)
+        return detectionRecord || aiResponse;
 
     } catch (error) {
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -100,11 +120,9 @@ const generatePersonalizedInsight = async (userCrops, sensorData, imageResult) =
 /**
  * 3. ENVIRONMENTAL RISK PREDICTION
  * Model: DeepSeek V3.2
- * Function: Predicts threats based on real-time weather and the user's registered crops.
  */
 const generateEnvironmentalRisk = async (crops, sensors) => {
     try {
-        // 🔥 ENHANCED PROMPT: Forces AI to identify the exact crop at risk and provide a prevention plan
         const prompt = `You are an expert AI Agronomist.
         Current Weather: Temperature ${sensors.temperature}°C, Humidity ${sensors.humidity}%, Soil Moisture ${sensors.soilMoisture}%.
         Farmer's Registered Crops: ${crops}.
@@ -134,7 +152,6 @@ const generateEnvironmentalRisk = async (crops, sensors) => {
 
         const data = await response.json();
         
-        // Robust JSON cleaning
         let clean = data.choices[0].message.content.trim().replace(/```json/gi, '').replace(/```/g, '');
         return JSON.parse(clean);
     } catch (err) {
