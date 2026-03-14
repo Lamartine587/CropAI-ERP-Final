@@ -10,6 +10,7 @@ const analyzeCropImage = async (filePath, mimeType, userId = null) => {
         const imageBuffer = fs.readFileSync(filePath);
         const base64Image = imageBuffer.toString('base64');
 
+        // 🔥 ENHANCED PROMPT: Forcing detailed prevention strategies
         const prompt = `Act as an expert Agricultural Pathologist. Analyze this crop image.
         Return ONLY a raw JSON object: 
         {
@@ -19,7 +20,7 @@ const analyzeCropImage = async (filePath, mimeType, userId = null) => {
             "confidence": number,
             "symptoms": "Detailed description of patterns",
             "treatments": ["Immediate Step", "Organic Fix", "Chemical Fix"],
-            "prevention": "Future prevention strategy"
+            "prevention": "A comprehensive, step-by-step prevention guide including soil management, watering habits, and field hygiene to avoid future outbreaks."
         }`;
 
         const response = await fetch('https://api.featherless.ai/v1/chat/completions', {
@@ -89,7 +90,7 @@ const generatePersonalizedInsight = async (userCrops, sensorData, imageResult) =
             })
         });
 
-        const data = await response.json(); // <-- Line 160 was failing here
+        const data = await response.json(); 
         let clean = data.choices[0].message.content.trim().replace(/```json/gi, '').replace(/```/g, '');
         return JSON.parse(clean);
     } catch (err) {
