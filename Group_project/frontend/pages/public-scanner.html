@@ -8,32 +8,181 @@
     <link rel="stylesheet" href="../css/style.css">
     
     <style>
-        /* Mobile-First Responsive Overrides */
+        /* Modern Mobile-First Styling */
         :root {
             --primary-green: #2d6a4f;
-            --light-bg: #f4f7f6;
+            --secondary-green: #40916c;
+            --accent-green: #d8f3dc;
+            --text-dark: #1b4332;
         }
 
         body {
-            background: var(--light-bg);
+            background: #f0f2f1;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .main-container {
-            width: 95%;
-            max-width: 800px;
+            width: 92%;
+            max-width: 600px;
             margin: 1.5rem auto;
             padding: 1.5rem;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
         }
 
-        /* Responsive Buttons */
-        .btn-group {
+        /* Large Touch Targets for Mobile */
+        .btn-action {
+            padding: 1.2rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s, opacity 0.2s;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--secondary-green);
+            padding: 4rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 20px;
+            background: #fafffd;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background: var(--accent-green);
+            border-color: var(--primary-green);
+        }
+
+        /* Responsive Grid for Results */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 480px) {
+            .result-grid { grid-template-columns: 1fr; }
+            .btn-group { flex-direction: column; }
+            .main-container { margin: 0.5rem auto; padding: 1.2rem; border-radius: 0 0 24px 24px; }
+        }
+
+        .info-card {
+            background: #f8faf9;
+            padding: 1rem;
+            border-radius: 12px;
+            border-bottom: 3px solid var(--secondary-green);
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 4px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" style="background: white; padding: 1rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <div class="nav-container" style="display: flex; justify-content: space-between; max-width: 1200px; margin: auto; align-items: center;">
+            <div class="logo">
+                <a href="index.html" style="text-decoration:none; color:var(--primary-green); font-weight:800; font-size: 1.4rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-leaf"></i> CropAI
+                </a>
+            </div>
+            <a href="login.html" style="padding: 0.6rem 1.2rem; color:var(--primary-green); border: 2px solid var(--primary-green); text-decoration:none; border-radius:10px; font-weight: 700; font-size: 0.9rem;">Login</a>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <header style="text-align: center; margin-bottom: 2rem;">
+            <h1 style="color: var(--text-dark); margin: 0; font-size: 1.8rem;">Field Diagnosis</h1>
+            <p style="color: #555; margin-top: 0.5rem;">Instant AI disease identification</p>
+        </header>
+
+        <section id="publicUploadArea" class="upload-area" onclick="document.getElementById('publicFile').click()">
+            <div style="background: var(--accent-green); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                <i class="fas fa-camera" style="font-size: 2rem; color:var(--primary-green);"></i>
+            </div>
+            <h3 style="margin: 0; color: var(--text-dark);">Take or Upload Photo</h3>
+            <p style="color: #666; font-size: 0.9rem; margin-top: 8px;">Select a clear image of the affected leaf</p>
+            
+            <input type="file" id="publicFile" accept="image/*" capture="environment" style="display: none;">
+        </section>
+
+        <section id="publicPreview" style="display: none; text-align: center; margin-top: 1rem;">
+            <img id="imgDisplay" src="" style="border-radius: 16px; width: 100%; object-fit: cover; max-height: 400px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+            
+            <div style="display: flex; gap: 12px; margin-top: 2rem;" class="btn-group">
+                <button onclick="location.reload()" class="btn-action" style="background: #eee; color: #444; flex: 1;">
+                    <i class="fas fa-undo"></i> Retake
+                </button>
+                <button id="analyzeBtn" class="btn-action" style="background: var(--primary-green); color: white; flex: 2;">
+                    <i class="fas fa-wand-magic-sparkles"></i> Run AI Analysis
+                </button>
+            </div>
+        </section>
+
+        <section id="spinner" style="display:none; text-align:center; padding: 4rem 0;">
+            <i class="fas fa-circle-notch fa-spin" style="font-size: 3.5rem; color:var(--primary-green);"></i>
+            <h3 style="margin-top: 1.5rem; color: var(--text-dark);">Analyzing Tissues...</h3>
+            <p style="color: #777;">Scanning for pathogenic patterns</p>
+        </section>
+
+        <section id="publicResult" style="display: none; margin-top: 1rem;">
+            <div style="position: relative;">
+                <img id="resultImgDisplay" src="" style="border-radius: 16px; width: 100%; max-height: 300px; object-fit: cover; filter: brightness(0.9);">
+                <div style="position: absolute; bottom: 15px; left: 15px; background: rgba(0,0,0,0.6); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; backdrop-filter: blur(4px);">
+                    <i class="fas fa-check-circle"></i> AI Scan Verified
+                </div>
+            </div>
+
+            <div class="result-grid">
+                <div class="info-card">
+                    <span class="info-label">Detected Crop</span>
+                    <strong id="cropType" style="font-size: 1.1rem; color: var(--text-dark);">--</strong>
+                </div>
+                <div class="info-card">
+                    <span class="info-label">Health Status</span>
+                    <strong id="cropStatus" style="font-size: 1.1rem; color: var(--text-dark);">--</strong>
+                </div>
+            </div>
+            
+            <div style="background: #fff; padding: 1.2rem; border-radius: 16px; border: 1px solid #e0e0e0; margin-bottom: 2rem;">
+                <h4 id="diseaseHeader" style="color: var(--primary-green); margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-microscope"></i> Diagnosis
+                </h4>
+                <p id="cropTreatment" style="margin: 0; line-height: 1.6; color: #444; font-size: 0.95rem;"></p>
+            </div>
+
+            <button onclick="location.reload()" class="btn-action" style="width: 100%; background: var(--text-dark); color: white;">
+                <i class="fas fa-plus"></i> New Scan
+            </button>
+        </section>
+    </main>
+
+    <script src="../js/public-scanner.js"></script>
+</body>
+</html>
             flex-direction: row;
             justify-content: center;
             gap: 1rem;
