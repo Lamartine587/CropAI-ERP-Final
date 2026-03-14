@@ -20,48 +20,45 @@
         </div>
     </nav>
 
-    <main style="max-width: 800px; margin: 4rem auto; padding: 2rem; background: white; border-radius: 15px; box-shadow: var(--shadow);">
-        <div style="text-align: center; margin-bottom: 2rem;">
+    <main style="max-width: 800px; margin: 4rem auto; padding: 2rem; background:white; border-radius: 15px; box-shadow: var(--shadow);">
+        <div style="text-align: center; margin-bottom: 2rem;color:green;font-weight: 900;">
             <h1>Instant AI Crop Diagnosis</h1>
-            <p style="color: var(--text-gray);">No account needed. Upload a photo of a sick leaf to get a diagnosis.</p>
+            <p style="color:black;font-weight: 600;">No account needed. Upload a photo of a sick leaf to get a diagnosis.</p>
         </div>
 
         <div class="detection-section">
             <div class="upload-area" id="publicUploadArea" onclick="document.getElementById('publicFile').click()" style="border: 3px dashed var(--primary-color); padding: 4rem; text-align: center; cursor: pointer;">
-                <i class="fas fa-camera" style="font-size: 4rem; color: var(--primary-color);"></i>
-                <h3 style="margin-top: 1rem;">Tap to Take Photo or Upload</h3>
+                <i class="fas fa-camera" style="font-size: 4rem; color:green;"></i>
+                <h3 style="margin-top: 1rem; color: black;">Tap to Take Photo or Upload</h3>
                 <input type="file" id="publicFile" accept="image/*" style="display: none;">
             </div>
 
             <div id="publicPreview" style="display: none; text-align: center; margin-top: 2rem;">
                 <img id="imgDisplay" src="" style="max-width: 100%; border-radius: 10px; margin-bottom: 1rem;">
                 <div style="display: flex; justify-content: center; gap: 1rem;">
-                    <button class="btn-secondary" onclick="location.reload()">Clear</button>
-                    <button class="btn-primary" id="analyzeBtn">Analyze with AI</button>
+                    <button class="btn-secondary" onclick="location.reload()"style="padding: 0.5rem 1rem; color:white; background-color: green; border: none; border-radius: 5px; cursor: pointer;">Clear</button>
+                    <button class="btn-primary" id="analyzeBtn"style="padding: 0.5rem 1rem; color:white; background-color: green; border: none; border-radius: 5px; cursor: pointer;">Analyze with AI</button>
                 </div>
             </div>
         </div>
 
         <div id="publicResult" style="display: none; margin-top: 3rem; padding: 2rem; background: #e8f5e9; border-radius: 10px;">
             <h2 id="diseaseHeader" style="color: var(--primary-dark);">Diagnosis Result</h2>
-            <hr style="margin: 1rem 0; border: 0; border-top: 1px solid #c8e6c9;">
-            <p><strong>Crop Identified:</strong> <span id="cropType">--</span></p>
+            <hr style="margin: 1rem 0; border: 0; border-top: 1px solid #68ae6a;">
+            <p><strong style="color: #0c580e;">Crop Identified:</strong> <span id="cropType">--</span></p>
             <p><strong>Status:</strong> <span id="cropStatus">--</span></p>
             <div style="margin-top: 1rem;">
-                <strong>Recommended Action:</strong>
-                <p id="cropTreatment" style="margin-top: 0.5rem; line-height: 1.6;"></p>
+                <strong style="color: #0d3f0f;">Recommended Action:</strong>
+                <p id="cropTreatment" style="margin-top: 0.5rem; line-height: 1.6;color: rgb(44, 111, 72);"></p>
             </div>
             
-            <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.5); border-radius: 5px; text-align: center;">
+            <div style="margin-top: 2rem; padding: 1rem; background: rgba(53, 215, 24, 0.5); border-radius: 5px; text-align: center;">
                 <p>Want to save this diagnosis to your farm history?</p>
-                <a href="register.html" style="color: var(--primary-color); font-weight: bold;">Create a free account now</a>
+                <a href="register.html" style="color: blue; font-weight: bold;">Create a free account now</a>
             </div>
         </div>
 
-        <div id="spinner" style="display: none; text-align: center; margin-top: 2rem;">
-            <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary-color);"></i>
-            <p>Gemini AI is examining the leaf structure...</p>
-        </div>
+        
     </main>
 
     <script src="../js/public-scanner.js"></script>
