@@ -37,25 +37,47 @@ async function fetchHistory() {
 
         // 3. Map the data into rows with data-labels for mobile responsiveness
         tableBody.innerHTML = data.map(item => {
+            // FIXED: Better date handling
+            let dateObj;
+            
+            // Try to use createdAt if available
+            if (item.createdAt) {
+                dateObj = new Date(item.createdAt);
+            } 
+            // Try to extract from MongoDB _id if it's an ObjectId string
+            else if (item._id && item._id.length === 24) {
+                // MongoDB ObjectIds contain timestamp in first 8 characters (4 bytes)
+                const timestamp = parseInt(item._id.substring(0, 8), 16) * 1000;
+                dateObj = new Date(timestamp);
+            }
+            // Fallback to current date if all else fails
+            else {
+                dateObj = new Date();
+            }
+
+            // Check if date is valid
+            if (isNaN(dateObj.getTime())) {
+                dateObj = new Date(); // Fallback to current date if invalid
+            }
+
             // Format date nicely
-            const dateObj = new Date(item.createdAt || item._id);
             const formattedDate = dateObj.toLocaleDateString('en-KE', { 
-                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' 
+                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
             });
 
             // Dynamic styling based on health status
-            const isHealthy = item.status.toLowerCase() === 'healthy';
+            const isHealthy = item.status && item.status.toLowerCase() === 'healthy';
             const statusColor = isHealthy ? '#2ecc71' : '#e74c3c';
             const statusIcon = isHealthy ? 'fa-check-circle' : 'fa-exclamation-triangle';
 
             return `
             <tr>
                 <td data-label="Date" style="color: #34495e; font-size: 0.9rem;">${formattedDate}</td>
-                <td data-label="Crop" style="color: #2c3e50; font-weight: 600;">${item.crop}</td>
-                <td data-label="Diagnosis" style="color: #34495e;">${item.disease}</td>
+                <td data-label="Crop" style="color: #2c3e50; font-weight: 600;">${item.crop || 'N/A'}</td>
+                <td data-label="Diagnosis" style="color: #34495e;">${item.disease || 'N/A'}</td>
                 <td data-label="Status">
                     <span style="background: ${statusColor}20; color: ${statusColor}; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
-                        <i class="fas ${statusIcon}"></i> ${item.status}
+                        <i class="fas ${statusIcon}"></i> ${item.status || 'Unknown'}
                     </span>
                 </td>
             </tr>
