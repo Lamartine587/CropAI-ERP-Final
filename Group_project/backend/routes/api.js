@@ -75,15 +75,16 @@ router.put('/auth/profile/update', auth, upload.single('avatar'), async (req, re
 // 2. IOT SENSOR DATA & PREDICTIVE ALERTS
 // ==========================================
 
+// Temporary cache so the dashboard can grab the latest AI thought without spamming the API
+let latestPredictionCache = null; 
+
 router.post('/iot/sensors', optionalAuth, async (req, res) => {
     const { temperature, humidity, soilMoisture } = req.body;
     const userId = req.user ? req.user.id : null;
 
     try {
-        // 1. Log data to MongoDB
         const newLog = await SensorLog.create({ user_id: userId, temperature, humidity, soilMoisture });
 
-        // 2. Proactive AI Prediction & Regional Broadcast
         if (userId) {
             const profile = await pgPool.query('SELECT location, crops FROM profiles WHERE user_id = $1', [userId]);
             const userRegion = profile.rows[0]?.location;
@@ -92,28 +93,35 @@ router.post('/iot/sensors', optionalAuth, async (req, res) => {
                 const prediction = await generateEnvironmentalRisk(profile.rows[0].crops, { temperature, humidity, soilMoisture });
 
                 if (prediction && prediction.riskLevel === 'High') {
+                    // Save to cache so dashboard.js can see it!
+                    latestPredictionCache = prediction; 
+
                     const neighbors = await pgPool.query(
                         'SELECT u.email FROM users u JOIN profiles p ON u.id = p.user_id WHERE LOWER(p.location) = LOWER($1) AND u.id != $2', 
                         [userRegion, userId]
                     );
-                    // Broadcast warnings to the community
                     neighbors.rows.forEach(n => sendRegionalWarning(n.email, userRegion, prediction.likelyAffectedCrop, prediction.predictedDisease, prediction));
+                } else {
+                    // Clear the cache if conditions are healthy
+                    latestPredictionCache = null; 
                 }
-                return res.status(201).json({ message: "IoT Data Logged", prediction, data: newLog });
+                return res.status(201).json({ message: "IoT Logged", prediction, data: newLog });
             }
         }
-        res.status(201).json({ message: "IoT Data Logged", data: newLog });
+        res.status(201).json({ message: "IoT Logged", data: newLog });
     } catch (err) {
-        console.error("IoT Logic Error:", err);
-        res.status(500).json({ error: "Failed to process sensor telemetry." });
+        res.status(500).json({ error: "Telemetry processing failure." });
     }
 });
 
-// Fetch Latest Telemetry for Dashboard
 router.get('/iot/sensors/latest', async (req, res) => {
     try {
         const latest = await SensorLog.findOne().sort({ timestamp: -1 });
-        res.json(latest || { temperature: '--', humidity: '--', soilMoisture: '--' });
+        // Attach the cached AI prediction before sending to dashboard!
+        const responseData = latest ? latest.toObject() : { temperature: '--', humidity: '--', soilMoisture: '--' };
+        responseData.prediction = latestPredictionCache; 
+        
+        res.json(responseData);
     } catch (err) {
         res.status(500).json({ error: "Could not fetch latest telemetry." });
     }
