@@ -1,58 +1,68 @@
 const nodemailer = require('nodemailer');
 
-// Helper to create the transporter once
-const createTransporter = () => {
-    return nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
-};
+// 1. Create a persistent transporter (Singleton Pattern)
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Simplifies host/port config for Gmail
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
+/**
+ * Personal Alert: Sent to the farmer who performed the scan.
+ */
 const sendAlertEmail = async (userEmail, crop, disease, insight) => {
     try {
-        const transporter = createTransporter();
         const mailOptions = {
-            from: `"CropAI Alerts" <${process.env.EMAIL_USER}>`,
+            from: `"CropAI Intelligence" <${process.env.EMAIL_USER}>`,
             to: userEmail,
-            subject: `Crop Health Alert: ${disease} Detected`,
-            html: `<p>Your ${crop} has been diagnosed with ${disease}. ${insight}</p>`
-        };
-        await transporter.sendMail(mailOptions);
-    } catch (error) {
-        console.error('Alert Email failed:', error);
-    }
-};
-
-const sendRegionalWarning = async (recipientEmail, region, crop, disease, insight) => {
-    try {
-        const transporter = createTransporter();
-        const mailOptions = {
-            from: `"CropAI Regional Alerts" <${process.env.EMAIL_USER}>`,
-            to: recipientEmail,
-            subject: `⚠️ REGIONAL ALERT: ${disease} in ${region}`,
+            subject: `🚩 Diagnosis Report: ${disease} found in ${crop}`,
             html: `
-                <div style="font-family: sans-serif; padding: 20px; border: 2px solid #e67e22; border-radius: 10px;">
-                    <h2 style="color: #e67e22;">📍 Regional Threat Detected</h2>
-                    <p>Hello Farmer, a crop threat has been identified in <strong>${region}</strong>.</p>
-                    <div style="background: #fff5eb; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                        <p><strong>Threat:</strong> ${disease} in ${crop}</p>
-                        <p><strong>Advice:</strong> ${insight.expertRecommendation}</p>
-                        <p><strong>Risk:</strong> ${insight.futureRisk}</p>
+                <div style="font-family: Arial, sans-serif; border: 1px solid #2ecc71; padding: 20px; border-radius: 12px;">
+                    <h2 style="color: #27ae60;">Scan Successful</h2>
+                    <p>Your <strong>${crop}</strong> has been analyzed.</p>
+                    <p><strong>Result:</strong> ${disease}</p>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                        <p>${insight.expertRecommendation || insight}</p>
                     </div>
                 </div>
             `
         };
         await transporter.sendMail(mailOptions);
     } catch (error) {
-        console.error('Regional Email failed:', error);
+        console.error('Personal Alert Email failed:', error);
+    }
+};
+
+/**
+ * Regional Warning: Broadcast to all farmers in the area.
+ */
+const sendRegionalWarning = async (recipientEmail, region, crop, disease, insight) => {
+    try {
+        const mailOptions = {
+            from: `"CropAI Regional Watch" <${process.env.EMAIL_USER}>`,
+            to: recipientEmail,
+            subject: `⚠️ REGIONAL THREAT: ${disease} in ${region}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 25px; border: 2px solid #e67e22; border-radius: 15px; background-color: #fff;">
+                    <h2 style="color: #d35400; margin-top: 0;">📍 Regional Outbreak Warning</h2>
+                    <p>A symptomatic case of <strong>${disease}</strong> has been confirmed in <strong>${region}</strong>.</p>
+                    
+                    <div style="background: #fff5eb; padding: 15px; border-radius: 10px; border-left: 5px solid #e67e22; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>Affected Crop:</strong> ${crop}</p>
+                        <p style="margin: 5px 0;"><strong>Prevention:</strong> ${insight.expertRecommendation || "Monitor your fields closely."}</p>
+                        <p style="margin: 5px 0;"><strong>Risk Level:</strong> ${insight.futureRisk || "High Spread Potential"}</p>
+                    </div>
+
+                    <p style="font-size: 0.9rem; color: #7f8c8d;">This is an automated intelligence alert to help maintain regional biosecurity.</p>
+                    <a href="${process.env.FRONTEND_URL}" style="display: inline-block; background: #27ae60; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Update Farm Data</a>
+                </div>
+            `
+        };
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.error(`Regional Warning failed for ${recipientEmail}:`, error);
     }
 };
 
