@@ -183,64 +183,7 @@
     <script src="../js/public-scanner.js"></script>
 </body>
 </html>
-            flex-direction: row;
-            justify-content: center;
-            gap: 1rem;
-            width: 100%;
-        }
-
-        @media (max-width: 480px) {
-            .btn-group {
-                flex-direction: column; /* Stack buttons on small phones */
-            }
-            .main-container {
-                margin: 1rem auto;
-                padding: 1rem;
-                border-radius: 12px;
-            }
-            h1 { font-size: 1.5rem; }
-            .upload-area { padding: 2rem !important; }
-        }
-
-        /* Fix for images to never overflow */
-        img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .upload-area {
-            border: 3px dashed var(--primary-green);
-            padding: 3.5rem 1rem;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 15px;
-            background: #f9fdfb;
-            transition: background 0.3s ease;
-        }
-
-        .upload-area:active {
-            background: #eef7f2;
-        }
-    </style>
-</head>
-<body>
-
-    <nav class="navbar" style="background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 0.8rem 1rem;">
-        <div class="nav-container" style="display: flex; justify-content: space-between; max-width: 1200px; margin: auto; align-items: center;">
-            <div class="logo">
-                <a href="index.html" style="text-decoration:none; color:var(--primary-green); font-weight:bold; font-size: 1.3rem;">
-                    <i class="fas fa-leaf"></i> CropAI
-                </a>
-            </div>
-            <a href="login.html" style="padding: 0.5rem 1.2rem; color:white; background:var(--primary-green); text-decoration:none; border-radius:8px; font-weight: 600;">Login</a>
-        </div>
-    </nav>
-
-    <main class="main-container">
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <h1 style="color: #1b4332; margin-bottom: 0.5rem;">Instant AI Diagnosis</h1>
+        <h1 style="color: #1b4332; margin-bottom: 0.5rem;">Instant AI Diagnosis</h1>
             <p style="color: #666;">Snap a photo of a sick leaf for a real-time assessment.</p>
         </div>
 
