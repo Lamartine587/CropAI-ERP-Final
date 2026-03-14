@@ -101,7 +101,8 @@ npm start
 ## 👥 Contributors
 
 * **Lamartine Kipkoech (Don)** - Full Stack Developer & AI Architect
-
+**Bildad Ochieng (Billy)**-Full stack Developer
+  
 ```
 
 
